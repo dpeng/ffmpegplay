@@ -1,0 +1,168 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: testFFplay - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating command line "rc.exe /l 0x409 /fo"Debug/testFFplay.res" /d "_DEBUG" "d:\other\code\testFFplay\testFFplay.rc"" 
+Creating temporary file "C:\DOCUME~1\dpeng\LOCALS~1\Temp\RSPB0F.tmp" with contents
+[
+/nologo /MTd /W3 /Gm /GX /ZI /Od /I "./SDL" /I "./ffmpeg" /I "./ffmpeg/libavutil" /I "./ffmpeg/libavcodec" /I "./ffmpeg/libavdevice" /I "./ffmpeg/libavfilter" /I "./ffmpeg/libavformat" /I "./ffmpeg/libpostproc" /I "./ffmpeg/libswscale" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
+"d:\other\code\testFFplay\cmdutils.c"
+"d:\other\code\testFFplay\ffplay.c"
+"d:\other\code\testFFplay\testFFplay.cpp"
+"d:\other\code\testFFplay\testFFplayDlg.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\dpeng\LOCALS~1\Temp\RSPB0F.tmp" 
+Creating temporary file "C:\DOCUME~1\dpeng\LOCALS~1\Temp\RSPB10.tmp" with contents
+[
+/nologo /MTd /W3 /Gm /GX /ZI /Od /I "./SDL" /I "./ffmpeg" /I "./ffmpeg/libavutil" /I "./ffmpeg/libavcodec" /I "./ffmpeg/libavdevice" /I "./ffmpeg/libavfilter" /I "./ffmpeg/libavformat" /I "./ffmpeg/libpostproc" /I "./ffmpeg/libswscale" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /Fp"Debug/testFFplay.pch" /Yc"stdafx.h" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
+"d:\other\code\testFFplay\StdAfx.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\dpeng\LOCALS~1\Temp\RSPB10.tmp" 
+Creating temporary file "C:\DOCUME~1\dpeng\LOCALS~1\Temp\RSPB11.tmp" with contents
+[
+SDL.lib avcodec-52.lib avformat-52.lib avutil-50.lib swscale-0.lib avdevice-52.lib postproc-51.lib avfilter-1.lib /nologo /subsystem:windows /incremental:yes /pdb:"Debug/testFFplay.pdb" /debug /machine:I386 /out:"Debug/testFFplay.exe" /pdbtype:sept /libpath:"./SDL" /libpath:"./ffmpeg" 
+.\Debug\cmdutils.obj
+.\Debug\ffplay.obj
+.\Debug\StdAfx.obj
+.\Debug\testFFplay.obj
+.\Debug\testFFplayDlg.obj
+.\Debug\testFFplay.res
+]
+Creating command line "link.exe @C:\DOCUME~1\dpeng\LOCALS~1\Temp\RSPB11.tmp"
+<h3>Output Window</h3>
+Compiling resources...
+Compiling...
+StdAfx.cpp
+Compiling...
+cmdutils.c
+d:\other\code\testffplay\ffmpeg\libavutil\common.h(66) : warning C4005: 'av_always_inline' : macro redefinition
+        d:\other\code\testffplay\ffmpeg\libavutil\attributes.h(39) : see previous definition of 'av_always_inline'
+d:\other\code\testffplay\cmdutils.c(81) : warning C4090: 'function' : different 'const' qualifiers
+d:\other\code\testffplay\cmdutils.c(81) : warning C4022: 'av_freep' : pointer mismatch for actual parameter 1
+d:\other\code\testffplay\cmdutils.c(87) : warning C4090: 'function' : different 'const' qualifiers
+d:\other\code\testffplay\cmdutils.c(87) : warning C4022: 'av_freep' : pointer mismatch for actual parameter 1
+d:\other\code\testffplay\cmdutils.c(88) : warning C4090: 'function' : different 'const' qualifiers
+d:\other\code\testffplay\cmdutils.c(88) : warning C4022: 'av_freep' : pointer mismatch for actual parameter 1
+d:\other\code\testffplay\cmdutils.c(90) : warning C4090: 'function' : different 'const' qualifiers
+d:\other\code\testffplay\cmdutils.c(90) : warning C4022: 'av_freep' : pointer mismatch for actual parameter 1
+d:\other\code\testffplay\cmdutils.c(91) : warning C4090: 'function' : different 'const' qualifiers
+d:\other\code\testffplay\cmdutils.c(91) : warning C4022: 'av_freep' : pointer mismatch for actual parameter 1
+d:\other\code\testffplay\cmdutils.c(274) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+d:\other\code\testffplay\cmdutils.c(276) : warning C4244: '=' : conversion from 'double ' to '__int64 ', possible loss of data
+d:\other\code\testffplay\cmdutils.c(279) : warning C4244: '=' : conversion from 'double ' to 'float ', possible loss of data
+d:\other\code\testffplay\cmdutils.c(308) : warning C4090: 'initializing' : different 'const' qualifiers
+d:\other\code\testffplay\cmdutils.c(316) : warning C4090: 'function' : different 'const' qualifiers
+d:\other\code\testffplay\cmdutils.c(316) : warning C4022: 'av_find_opt' : pointer mismatch for actual parameter 1
+d:\other\code\testffplay\cmdutils.c(353) : warning C4090: 'function' : different 'const' qualifiers
+d:\other\code\testffplay\cmdutils.c(353) : warning C4022: 'av_realloc' : pointer mismatch for actual parameter 1
+d:\other\code\testffplay\cmdutils.c(355) : warning C4090: 'function' : different 'const' qualifiers
+d:\other\code\testffplay\cmdutils.c(355) : warning C4022: 'av_realloc' : pointer mismatch for actual parameter 1
+d:\other\code\testffplay\cmdutils.c(846) : warning C4047: 'function' : 'const char *' differs in levels of indirection from 'unsigned int '
+d:\other\code\testffplay\cmdutils.c(846) : warning C4024: 'sprintf' : different types for formal and actual parameter 2
+d:\other\code\testffplay\cmdutils.c(849) : warning C4047: 'function' : 'const char *' differs in levels of indirection from 'unsigned int '
+d:\other\code\testffplay\cmdutils.c(849) : warning C4024: 'sprintf' : different types for formal and actual parameter 2
+ffplay.c
+d:\other\code\testffplay\ffmpeg\libavutil\common.h(66) : warning C4005: 'av_always_inline' : macro redefinition
+        d:\other\code\testffplay\ffmpeg\libavutil\attributes.h(39) : see previous definition of 'av_always_inline'
+d:\other\code\testffplay\sdl\sdl_config_win32.h(33) : warning C4142: benign redefinition of type
+d:\other\code\testffplay\sdl\sdl_config_win32.h(34) : warning C4142: benign redefinition of type
+d:\other\code\testffplay\sdl\sdl_config_win32.h(35) : warning C4142: benign redefinition of type
+d:\other\code\testffplay\sdl\sdl_config_win32.h(36) : warning C4142: benign redefinition of type
+d:\other\code\testffplay\sdl\sdl_config_win32.h(37) : warning C4142: benign redefinition of type
+d:\other\code\testffplay\sdl\sdl_config_win32.h(38) : warning C4142: benign redefinition of type
+d:\other\code\testffplay\ffplay.c(518) : warning C4244: '=' : conversion from 'long ' to 'unsigned char ', possible loss of data
+d:\other\code\testffplay\ffplay.c(519) : warning C4244: '=' : conversion from 'long ' to 'unsigned char ', possible loss of data
+d:\other\code\testffplay\ffplay.c(520) : warning C4244: '=' : conversion from 'long ' to 'unsigned char ', possible loss of data
+d:\other\code\testffplay\ffplay.c(531) : warning C4244: '=' : conversion from 'long ' to 'unsigned char ', possible loss of data
+d:\other\code\testffplay\ffplay.c(537) : warning C4244: '=' : conversion from 'long ' to 'unsigned char ', possible loss of data
+d:\other\code\testffplay\ffplay.c(538) : warning C4244: '=' : conversion from 'long ' to 'unsigned char ', possible loss of data
+d:\other\code\testffplay\ffplay.c(539) : warning C4244: '=' : conversion from 'long ' to 'unsigned char ', possible loss of data
+d:\other\code\testffplay\ffplay.c(547) : warning C4244: '=' : conversion from 'long ' to 'unsigned char ', possible loss of data
+d:\other\code\testffplay\ffplay.c(548) : warning C4244: '=' : conversion from 'long ' to 'unsigned char ', possible loss of data
+d:\other\code\testffplay\ffplay.c(549) : warning C4244: '=' : conversion from 'long ' to 'unsigned char ', possible loss of data
+d:\other\code\testffplay\ffplay.c(568) : warning C4244: '=' : conversion from 'long ' to 'unsigned char ', possible loss of data
+d:\other\code\testffplay\ffplay.c(575) : warning C4244: '=' : conversion from 'long ' to 'unsigned char ', possible loss of data
+d:\other\code\testffplay\ffplay.c(576) : warning C4244: '=' : conversion from 'long ' to 'unsigned char ', possible loss of data
+d:\other\code\testffplay\ffplay.c(577) : warning C4244: '=' : conversion from 'long ' to 'unsigned char ', possible loss of data
+d:\other\code\testffplay\ffplay.c(588) : warning C4244: '=' : conversion from 'long ' to 'unsigned char ', possible loss of data
+d:\other\code\testffplay\ffplay.c(594) : warning C4244: '=' : conversion from 'long ' to 'unsigned char ', possible loss of data
+d:\other\code\testffplay\ffplay.c(602) : warning C4244: '=' : conversion from 'long ' to 'unsigned char ', possible loss of data
+d:\other\code\testffplay\ffplay.c(608) : warning C4244: '=' : conversion from 'long ' to 'unsigned char ', possible loss of data
+d:\other\code\testffplay\ffplay.c(610) : warning C4244: '=' : conversion from 'long ' to 'unsigned char ', possible loss of data
+d:\other\code\testffplay\ffplay.c(611) : warning C4244: '=' : conversion from 'long ' to 'unsigned char ', possible loss of data
+d:\other\code\testffplay\ffplay.c(623) : warning C4244: '=' : conversion from 'long ' to 'unsigned char ', possible loss of data
+d:\other\code\testffplay\ffplay.c(630) : warning C4244: '=' : conversion from 'long ' to 'unsigned char ', possible loss of data
+d:\other\code\testffplay\ffplay.c(631) : warning C4244: '=' : conversion from 'long ' to 'unsigned char ', possible loss of data
+d:\other\code\testffplay\ffplay.c(632) : warning C4244: '=' : conversion from 'long ' to 'unsigned char ', possible loss of data
+d:\other\code\testffplay\ffplay.c(651) : warning C4244: '=' : conversion from 'long ' to 'unsigned char ', possible loss of data
+d:\other\code\testffplay\ffplay.c(652) : warning C4244: '=' : conversion from 'long ' to 'unsigned char ', possible loss of data
+d:\other\code\testffplay\ffplay.c(653) : warning C4244: '=' : conversion from 'long ' to 'unsigned char ', possible loss of data
+d:\other\code\testffplay\ffplay.c(664) : warning C4244: '=' : conversion from 'long ' to 'unsigned char ', possible loss of data
+d:\other\code\testffplay\ffplay.c(670) : warning C4244: '=' : conversion from 'long ' to 'unsigned char ', possible loss of data
+d:\other\code\testffplay\ffplay.c(671) : warning C4244: '=' : conversion from 'long ' to 'unsigned char ', possible loss of data
+d:\other\code\testffplay\ffplay.c(672) : warning C4244: '=' : conversion from 'long ' to 'unsigned char ', possible loss of data
+d:\other\code\testffplay\ffplay.c(680) : warning C4244: '=' : conversion from 'long ' to 'unsigned char ', possible loss of data
+d:\other\code\testffplay\ffplay.c(681) : warning C4244: '=' : conversion from 'long ' to 'unsigned char ', possible loss of data
+d:\other\code\testffplay\ffplay.c(682) : warning C4244: '=' : conversion from 'long ' to 'unsigned char ', possible loss of data
+d:\other\code\testffplay\ffplay.c(713) : warning C4244: '=' : conversion from 'double ' to 'float ', possible loss of data
+d:\other\code\testffplay\ffplay.c(715) : warning C4244: '=' : conversion from 'double ' to 'float ', possible loss of data
+d:\other\code\testffplay\ffplay.c(738) : warning C4018: '<' : signed/unsigned mismatch
+d:\other\code\testffplay\ffplay.c(750) : warning C4013: 'rint' undefined; assuming extern returning int
+d:\other\code\testffplay\ffplay.c(813) : warning C4244: '=' : conversion from '__int64 ' to 'short ', possible loss of data
+d:\other\code\testffplay\ffplay.c(900) : warning C4244: '=' : conversion from 'double ' to 'float ', possible loss of data
+d:\other\code\testffplay\ffplay.c(910) : warning C4244: 'initializing' : conversion from 'double ' to 'int ', possible loss of data
+d:\other\code\testffplay\ffplay.c(912) : warning C4244: 'initializing' : conversion from 'double ' to 'int ', possible loss of data
+d:\other\code\testffplay\ffplay.c(1162) : warning C4305: '*=' : truncation from 'const double ' to 'float '
+d:\other\code\testffplay\ffplay.c(1385) : warning C4244: '=' : conversion from 'const double ' to 'float ', possible loss of data
+d:\other\code\testffplay\ffplay.c(1454) : warning C4244: '=' : conversion from '__int64 ' to 'int ', possible loss of data
+d:\other\code\testffplay\ffplay.c(1561) : warning C4244: '-=' : conversion from 'const double ' to 'float ', possible loss of data
+d:\other\code\testffplay\ffplay.c(1934) : warning C4018: '<' : signed/unsigned mismatch
+d:\other\code\testffplay\ffplay.c(2089) : warning C4013: 'av_audio_convert_free' undefined; assuming extern returning int
+d:\other\code\testffplay\ffplay.c(2090) : warning C4013: 'av_audio_convert_alloc' undefined; assuming extern returning int
+d:\other\code\testffplay\ffplay.c(2091) : warning C4047: '=' : 'struct AVAudioConvert *' differs in levels of indirection from 'int '
+d:\other\code\testffplay\ffplay.c(2107) : warning C4013: 'av_audio_convert' undefined; assuming extern returning int
+d:\other\code\testffplay\ffplay.c(2173) : warning C4018: '>=' : signed/unsigned mismatch
+d:\other\code\testffplay\ffplay.c(2207) : warning C4018: '>=' : signed/unsigned mismatch
+d:\other\code\testffplay\ffplay.c(2304) : warning C4018: '>=' : signed/unsigned mismatch
+d:\other\code\testffplay\ffplay.c(2452) : warning C4018: '<' : signed/unsigned mismatch
+d:\other\code\testffplay\ffplay.c(2678) : warning C4018: '>=' : signed/unsigned mismatch
+d:\other\code\testffplay\ffplay.c(2817) : warning C4244: '=' : conversion from '__int64 ' to 'double ', possible loss of data
+d:\other\code\testffplay\ffplay.c(2819) : warning C4244: '=' : conversion from '__int64 ' to 'double ', possible loss of data
+d:\other\code\testffplay\ffplay.c(2821) : warning C4244: '=' : conversion from '__int64 ' to 'double ', possible loss of data
+d:\other\code\testffplay\ffplay.c(2828) : warning C4244: 'function' : conversion from 'double ' to '__int64 ', possible loss of data
+d:\other\code\testffplay\ffplay.c(2828) : warning C4244: 'function' : conversion from 'double ' to '__int64 ', possible loss of data
+d:\other\code\testffplay\ffplay.c(2863) : warning C4244: 'function' : conversion from 'double ' to '__int64 ', possible loss of data
+d:\other\code\testffplay\ffplay.c(2870) : warning C4244: '=' : conversion from '__int64 ' to 'int ', possible loss of data
+d:\other\code\testffplay\ffplay.c(2875) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+d:\other\code\testffplay\ffplay.c(2881) : warning C4244: '=' : conversion from 'double ' to '__int64 ', possible loss of data
+d:\other\code\testffplay\ffplay.c(2929) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+d:\other\code\testffplay\ffplay.c(2935) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+d:\other\code\testffplay\ffplay.c(2983) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+d:\other\code\testffplay\ffplay.c(2989) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+d:\other\code\testffplay\ffplay.c(2995) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+d:\other\code\testffplay\ffplay.c(3007) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+d:\other\code\testffplay\ffplay.c(3117) : warning C4244: '=' : conversion from 'long ' to 'unsigned short ', possible loss of data
+d:\other\code\testffplay\ffplay.c(3118) : warning C4244: '=' : conversion from 'long ' to 'unsigned short ', possible loss of data
+d:\other\code\testffplay\ffplay.c(3178) : warning C4098: 'playMpegFile' : 'void' function returning a value
+d:\other\code\testffplay\ffplay.c(3115) : warning C4101: 'i' : unreferenced local variable
+Generating Code...
+d:\other\code\testffplay\ffplay.c(915) : warning C4761: integral size mismatch in argument; conversion supplied
+d:\other\code\testffplay\ffplay.c(915) : warning C4761: integral size mismatch in argument; conversion supplied
+d:\other\code\testffplay\ffplay.c(915) : warning C4761: integral size mismatch in argument; conversion supplied
+Compiling...
+testFFplay.cpp
+testFFplayDlg.cpp
+Generating Code...
+Linking...
+
+
+
+<h3>Results</h3>
+testFFplay.exe - 0 error(s), 110 warning(s)
+</pre>
+</body>
+</html>
