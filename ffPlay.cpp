@@ -2930,9 +2930,15 @@ double CffPlay::playGetCurrentTime()
 
 void CffPlay::playSetSeekPosition(unsigned int pos)
 {
-	int64_t ts;
-	ts = (pos * cur_stream->ic->duration)/100;
-	if (cur_stream->ic->start_time != AV_NOPTS_VALUE)
-		ts += cur_stream->ic->start_time;
-	stream_seek(cur_stream, ts, 0, 0);
+	if ((NULL != cur_stream) && (NULL != cur_stream->ic))
+	{
+		int64_t ts;
+		ts = (pos * cur_stream->ic->duration)/100;
+		if (cur_stream->ic->start_time != AV_NOPTS_VALUE)
+			ts += cur_stream->ic->start_time;
+		stream_seek(cur_stream, ts, 0, 0);
+	}
+	else
+	{
+	}
 }

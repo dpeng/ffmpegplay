@@ -91,6 +91,7 @@ BEGIN_MESSAGE_MAP(CTestFFplayDlg, CDialog)
 	ON_BN_CLICKED(IDC_BTNPAUSE, &CTestFFplayDlg::OnBnClickedBtnpause)
 	ON_BN_CLICKED(IDC_BTNCLOSE, &CTestFFplayDlg::OnBnClickedBtnclose)
 	ON_WM_TIMER()
+	ON_WM_HSCROLL()
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -130,6 +131,7 @@ BOOL CTestFFplayDlg::OnInitDialog()
 	m_sliderPlay.SetLineSize(1);
 	m_sliderPlay.SetPageSize(5);
 	SetTimer(1,100,NULL) ;
+	m_nPrePlayPosition = 0;
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
@@ -251,5 +253,27 @@ void CTestFFplayDlg::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
 	m_sliderPlay.SetPos(m_ffPlay.playGetCurrentTime()*100/m_ffPlay.playGetTotalTime());
+	m_nPrePlayPosition = m_sliderPlay.GetPos();
 	CDialog::OnTimer(nIDEvent);
+}
+
+
+void CTestFFplayDlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+{
+	// TODO: Add your message handler code here and/or call default
+	int nPosition = 0;
+	switch(GetWindowLong(pScrollBar->m_hWnd, GWL_ID))
+	{
+	case IDC_SLIDERPLAYPROGRESS:
+		nPosition = m_sliderPlay.GetPos();
+		if (abs(nPosition-m_nPrePlayPosition) < 2 && nPosition != 0)
+		{
+			break;
+		}
+		m_ffPlay.playSetSeekPosition(nPosition);
+	default:
+		break ;
+	}
+
+	CDialog::OnHScroll(nSBCode, nPos, pScrollBar);
 }

@@ -52,10 +52,12 @@ protected:
 public:
 	CString m_strFileName;
 	CffPlay m_ffPlay;
+	int m_nPrePlayPosition;
 	afx_msg void OnBnClickedBtnpause();
 	afx_msg void OnBnClickedBtnclose();
 	CSliderCtrl m_sliderPlay;
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 };
 
 //{{AFX_INSERT_LOCATION}}
