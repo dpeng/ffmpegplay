@@ -73,8 +73,9 @@ void CTestFFplayDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CTestFFplayDlg)
-		// NOTE: the ClassWizard will add DDX and DDV calls here
+	// NOTE: the ClassWizard will add DDX and DDV calls here
 	//}}AFX_DATA_MAP
+	DDX_Control(pDX, IDC_SLIDERPLAYPROGRESS, m_sliderPlay);
 }
 
 BEGIN_MESSAGE_MAP(CTestFFplayDlg, CDialog)
@@ -89,6 +90,7 @@ BEGIN_MESSAGE_MAP(CTestFFplayDlg, CDialog)
 	//}}AFX_MSG_MAP
 	ON_BN_CLICKED(IDC_BTNPAUSE, &CTestFFplayDlg::OnBnClickedBtnpause)
 	ON_BN_CLICKED(IDC_BTNCLOSE, &CTestFFplayDlg::OnBnClickedBtnclose)
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -122,7 +124,12 @@ BOOL CTestFFplayDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 	
 	// TODO: Add extra initialization here
-	
+	m_sliderPlay.SetRangeMin(0);
+	m_sliderPlay.SetRangeMax(100);
+	m_sliderPlay.SetPos(0);
+	m_sliderPlay.SetLineSize(1);
+	m_sliderPlay.SetPageSize(5);
+	SetTimer(1,100,NULL) ;
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
@@ -216,6 +223,9 @@ void CTestFFplayDlg::OnOpenfile()
 	
 	m_strFileName = tempfilename;
 	tempfilename = _T("");
+	//after open play the media
+	Sleep(10);
+	OnBtnplay();
 }
 
 void CTestFFplayDlg::OnBnClickedBtnpause()
@@ -228,10 +238,18 @@ void CTestFFplayDlg::OnBnClickedBtnclose()
 {
 	// TODO: Add your control notification handler code here
 	m_ffPlay.playClose();
+	m_sliderPlay.SetPos(0);
 }
 
 void CTestFFplayDlg::OnClose() 
 {
 	OnBnClickedBtnclose();
 	CDialog::OnClose();
+}
+
+void CTestFFplayDlg::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: Add your message handler code here and/or call default
+	m_sliderPlay.SetPos(m_ffPlay.playGetCurrentTime()*100/m_ffPlay.playGetTotalTime());
+	CDialog::OnTimer(nIDEvent);
 }

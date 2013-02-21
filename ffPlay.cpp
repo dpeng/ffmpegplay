@@ -1,13 +1,16 @@
 #include "ffPlay.h"
 #include <tchar.h>
-#include<stdio.h>
+#include <stdio.h>
+#include <atlstr.h>
 
 CffPlay::CffPlay(void)
 {
+	m_playFFMpegProcessHandler = NULL;
 }
 
 CffPlay::~CffPlay(void)
 {
+	m_playFFMpegProcessHandler = NULL;
 }
 
 #define _XOPEN_SOURCE 600
@@ -762,7 +765,7 @@ static void video_audio_display(VideoState *s)
            the last buffer computation */
         if (audio_callback_time) {
             time_diff = av_gettime() - audio_callback_time;
-            delay -= (time_diff * s->audio_tgt.freq) / 1000000;
+            delay -= (time_diff * s->audio_tgt.freq) / AV_TIME_BASE;
         }
 
         delay += 2 * data_used;
@@ -1002,7 +1005,7 @@ static double get_audio_clock(VideoState *is)
     if (is->paused) {
         return is->audio_current_pts;
     } else {
-        return is->audio_current_pts_drift + av_gettime() / 1000000.0;
+        return is->audio_current_pts_drift + av_gettime() / AV_TIME_BASE;
     }
 }
 
@@ -1012,7 +1015,7 @@ static double get_video_clock(VideoState *is)
     if (is->paused) {
         return is->video_current_pts;
     } else {
-        return is->video_current_pts_drift + av_gettime() / 1000000.0;
+        return is->video_current_pts_drift + av_gettime() / AV_TIME_BASE;
     }
 }
 
@@ -1061,12 +1064,14 @@ static void stream_seek(VideoState *is, int64_t pos, int64_t rel, int seek_by_by
 /* pause or resume the video */
 static void stream_toggle_pause(VideoState *is)
 {
-    if (is->paused) {
-        is->frame_timer += av_gettime() / 1000000.0 + is->video_current_pts_drift - is->video_current_pts;
-        if (is->read_pause_return != AVERROR(ENOSYS)) {
-            is->video_current_pts = is->video_current_pts_drift + av_gettime() / 1000000.0;
+    if (is->paused) 
+	{
+        is->frame_timer += av_gettime() / AV_TIME_BASE + is->video_current_pts_drift - is->video_current_pts;
+        if (is->read_pause_return != AVERROR(ENOSYS)) 
+		{
+            is->video_current_pts = is->video_current_pts_drift + av_gettime() / AV_TIME_BASE;
         }
-        is->video_current_pts_drift = is->video_current_pts - av_gettime() / 1000000.0;
+        is->video_current_pts_drift = is->video_current_pts - av_gettime() / AV_TIME_BASE;
     }
     is->paused = !is->paused;
 }
@@ -1128,7 +1133,7 @@ static void pictq_prev_picture(VideoState *is) {
 }
 
 static void update_video_pts(VideoState *is, double pts, int64_t pos) {
-    double time = av_gettime() / 1000000.0;
+    double time = av_gettime() / AV_TIME_BASE;
     /* update current video pts */
     is->video_current_pts = pts;
     is->video_current_pts_drift = is->video_current_pts - time;
@@ -1184,7 +1189,7 @@ retry:
             }
             delay = compute_target_delay(is->frame_last_duration, is);
 
-            time= av_gettime()/1000000.0;
+            time= av_gettime()/AV_TIME_BASE;
             if (time < is->frame_timer + delay)
                 return;
 
@@ -1461,7 +1466,7 @@ static int get_video_frame(VideoState *is, AVFrame *frame, int64_t *pts, AVPacke
         is->video_current_pos = -1;
         is->frame_last_pts = AV_NOPTS_VALUE;
         is->frame_last_duration = 0;
-        is->frame_timer = (double)av_gettime() / 1000000.0;
+        is->frame_timer = (double)av_gettime() / AV_TIME_BASE;
         is->frame_last_dropped_pts = AV_NOPTS_VALUE;
         SDL_UnlockMutex(is->pictq_mutex);
 
@@ -1788,7 +1793,7 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
             *pts_ptr = pts;
             is->audio_clock += (double)data_size /
                 (dec->channels * dec->sample_rate * av_get_bytes_per_sample(dec->sample_fmt));
-#ifdef DEBUG
+#ifdef _DEBUG
             {
                 static double last_clock;
                 printf("audio: delay=%0.3f clock=%0.3f pts=%0.3f\n",
@@ -1867,7 +1872,7 @@ static void sdl_audio_callback(void *opaque, Uint8 *stream, int len)
     is->audio_write_buf_size = is->audio_buf_size - is->audio_buf_index;
     /* Let's assume the audio driver that is used by SDL has two periods. */
     is->audio_current_pts = is->audio_clock - (double)(2 * is->audio_hw_buf_size + is->audio_write_buf_size) / bytes_per_sec;
-    is->audio_current_pts_drift = is->audio_current_pts - audio_callback_time / 1000000.0;
+    is->audio_current_pts_drift = is->audio_current_pts - audio_callback_time / AV_TIME_BASE;
 }
 
 static int audio_open(void *opaque, int64_t wanted_channel_layout, int wanted_nb_channels, int wanted_sample_rate, struct AudioParams *audio_hw_params)
@@ -2329,7 +2334,11 @@ static int read_thread(void *arg)
         ret = av_read_frame(ic, pkt);
         if (ret < 0) {
             if (ret == AVERROR_EOF || url_feof(ic->pb))
+			{
                 eof = 1;
+				is->abort_request = 1;
+				break;
+			}
             if (ic->pb && ic->pb->error)
                 break;
             SDL_LockMutex(wait_mutex);
@@ -2341,8 +2350,8 @@ static int read_thread(void *arg)
         pkt_in_play_range = duration == AV_NOPTS_VALUE ||
                 (pkt->pts - ic->streams[pkt->stream_index]->start_time) *
                 av_q2d(ic->streams[pkt->stream_index]->time_base) -
-                (double)(start_time != AV_NOPTS_VALUE ? start_time : 0) / 1000000
-                <= ((double)duration / 1000000);
+                (double)(start_time != AV_NOPTS_VALUE ? start_time : 0) / AV_TIME_BASE
+                <= ((double)duration / AV_TIME_BASE);
         if (pkt->stream_index == is->audio_stream && pkt_in_play_range) {
             packet_queue_put(&is->audioq, pkt);
         } else if (pkt->stream_index == is->video_stream && pkt_in_play_range) {
@@ -2488,6 +2497,8 @@ static void toggle_full_screen(VideoState *is)
 
 static void toggle_pause(VideoState *is)
 {
+	if (!is)
+		return;
     stream_toggle_pause(is);
     is->step = 0;
 }
@@ -2604,50 +2615,7 @@ static int opt_codec(void *o, const char *opt, const char *arg)
 
 static int dummy;
 
-static const OptionDef options[] = {
-	{	},
-	/*
-    { "x", HAS_ARG, { .func_arg = opt_width }, "force displayed width", "width" },
-    { "y", HAS_ARG, { .func_arg = opt_height }, "force displayed height", "height" },
-    { "s", HAS_ARG | OPT_VIDEO, { .func_arg = opt_frame_size }, "set frame size (WxH or abbreviation)", "size" },
-    { "fs", OPT_BOOL, { &is_full_screen }, "force full screen" },
-    { "an", OPT_BOOL, { &audio_disable }, "disable audio" },
-    { "vn", OPT_BOOL, { &video_disable }, "disable video" },
-    { "ast", OPT_INT | HAS_ARG | OPT_EXPERT, { &wanted_stream[AVMEDIA_TYPE_AUDIO] }, "select desired audio stream", "stream_number" },
-    { "vst", OPT_INT | HAS_ARG | OPT_EXPERT, { &wanted_stream[AVMEDIA_TYPE_VIDEO] }, "select desired video stream", "stream_number" },
-    { "sst", OPT_INT | HAS_ARG | OPT_EXPERT, { &wanted_stream[AVMEDIA_TYPE_SUBTITLE] }, "select desired subtitle stream", "stream_number" },
-    { "ss", HAS_ARG, { .func_arg = opt_seek }, "seek to a given position in seconds", "pos" },
-    { "t", HAS_ARG, { .func_arg = opt_duration }, "play  \"duration\" seconds of audio/video", "duration" },
-    { "bytes", OPT_INT | HAS_ARG, { &seek_by_bytes }, "seek by bytes 0=off 1=on -1=auto", "val" },
-    { "nodisp", OPT_BOOL, { &display_disable }, "disable graphical display" },
-    { "f", HAS_ARG, { .func_arg = opt_format }, "force format", "fmt" },
-    { "pix_fmt", HAS_ARG | OPT_EXPERT | OPT_VIDEO, { .func_arg = opt_frame_pix_fmt }, "set pixel format", "format" },
-    { "stats", OPT_BOOL | OPT_EXPERT, { &show_status }, "show status", "" },
-    { "bug", OPT_INT | HAS_ARG | OPT_EXPERT, { &workaround_bugs }, "workaround bugs", "" },
-    { "fast", OPT_BOOL | OPT_EXPERT, { &fast }, "non spec compliant optimizations", "" },
-    { "genpts", OPT_BOOL | OPT_EXPERT, { &genpts }, "generate pts", "" },
-    { "drp", OPT_INT | HAS_ARG | OPT_EXPERT, { &decoder_reorder_pts }, "let decoder reorder pts 0=off 1=on -1=auto", ""},
-    { "lowres", OPT_INT | HAS_ARG | OPT_EXPERT, { &lowres }, "", "" },
-    { "skiploop", OPT_INT | HAS_ARG | OPT_EXPERT, { &skip_loop_filter }, "", "" },
-    { "skipframe", OPT_INT | HAS_ARG | OPT_EXPERT, { &skip_frame }, "", "" },
-    { "skipidct", OPT_INT | HAS_ARG | OPT_EXPERT, { &skip_idct }, "", "" },
-    { "idct", OPT_INT | HAS_ARG | OPT_EXPERT, { &idct }, "set idct algo",  "algo" },
-    { "ec", OPT_INT | HAS_ARG | OPT_EXPERT, { &error_concealment }, "set error concealment options",  "bit_mask" },
-    { "sync", HAS_ARG | OPT_EXPERT, { .func_arg = opt_sync }, "set audio-video sync. type (type=audio/video/ext)", "type" },
-    { "autoexit", OPT_BOOL | OPT_EXPERT, { &autoexit }, "exit at the end", "" },
-    { "exitonkeydown", OPT_BOOL | OPT_EXPERT, { &exit_on_keydown }, "exit on key down", "" },
-    { "exitonmousedown", OPT_BOOL | OPT_EXPERT, { &exit_on_mousedown }, "exit on mouse down", "" },
-    { "loop", OPT_INT | HAS_ARG | OPT_EXPERT, { &loop }, "set number of times the playback shall be looped", "loop count" },
-    { "framedrop", OPT_BOOL | OPT_EXPERT, { &framedrop }, "drop frames when cpu is too slow", "" },
-    { "infbuf", OPT_BOOL | OPT_EXPERT, { &infinite_buffer }, "don't limit the input buffer size (useful with realtime streams)", "" },
-    { "window_title", OPT_STRING | HAS_ARG, { &window_title }, "set window title", "window title" },
-    { "rdftspeed", OPT_INT | HAS_ARG| OPT_AUDIO | OPT_EXPERT, { &rdftspeed }, "rdft speed", "msecs" },
-    { "showmode", HAS_ARG, { .func_arg = opt_show_mode}, "select show mode (0 = video, 1 = waves, 2 = RDFT)", "mode" },
-    { "default", HAS_ARG | OPT_AUDIO | OPT_VIDEO | OPT_EXPERT, { .func_arg = opt_default }, "generic catch all option", "" },
-    { "i", OPT_BOOL, { &dummy}, "read specified file", "input_file"},
-    { "codec", HAS_ARG, { .func_arg = opt_codec}, "force decoder", "decoder" },
-    { NULL, },*/
-};
+static const OptionDef options[] = {{	}};
 
 static void show_usage(void)
 {
@@ -2814,7 +2782,7 @@ do_seek:
 				int64_t ts;
 				int ns, hh, mm, ss;
 				int tns, thh, tmm, tss;
-				tns  = cur_stream->ic->duration / 1000000LL;
+				tns  = cur_stream->ic->duration / AV_TIME_BASE;
 				thh  = tns / 3600;
 				tmm  = (tns % 3600) / 60;
 				tss  = (tns % 60);
@@ -2854,11 +2822,13 @@ do_seek:
 			break;
 		}
 	}
+	//pThis->playClose();
 	return 0;
 }
 /* Called from the main */
 void CffPlay::playMpegFile(char* fileName, RECT* rc, char* variable)
 {
+	playClose();
 	int flags, i;
 
 	sdlRc.h = rc->bottom - rc->top;
@@ -2905,10 +2875,7 @@ void CffPlay::playMpegFile(char* fileName, RECT* rc, char* variable)
 
 	isExitEventLoop = FALSE;
 	DWORD dw;
-	CreateThread(NULL,0,CffPlay::playFFMpegPro,this,0,&dw);
-	//free(cur_stream);
-	//cur_stream = NULL;
-	
+	m_playFFMpegProcessHandler = CreateThread(NULL,0,CffPlay::playFFMpegPro,this,0,&dw);
 	return;
 }
 
@@ -2919,6 +2886,8 @@ void CffPlay::playPause()
 
 void CffPlay::playClose()
 {
+	CloseHandle(m_playFFMpegProcessHandler);
+	m_playFFMpegProcessHandler = NULL;
 	isExitEventLoop = TRUE;
 	Sleep(100);
 	if (cur_stream) {
@@ -2930,4 +2899,40 @@ void CffPlay::playClose()
 		printf("\n");
 	SDL_Quit();
 	av_log(NULL, AV_LOG_QUIET, "");
+}
+
+double CffPlay::playGetTotalTime()
+{
+	double totalTimeInSec;
+	if ((NULL != cur_stream) && (NULL != cur_stream->ic))
+	{
+		totalTimeInSec = cur_stream->ic->duration / AV_TIME_BASE;
+	} 
+	else
+	{
+		totalTimeInSec = 0;
+	}
+	return totalTimeInSec;
+}
+double CffPlay::playGetCurrentTime()
+{
+	double currentTimeInSec;
+	if ((NULL != cur_stream) && (NULL != cur_stream->ic))
+	{
+		currentTimeInSec = cur_stream->video_current_pts - cur_stream->ic->start_time;
+	}
+	else
+	{
+		currentTimeInSec = 0;
+	}
+	return currentTimeInSec;
+}
+
+void CffPlay::playSetSeekPosition(unsigned int pos)
+{
+	int64_t ts;
+	ts = (pos * cur_stream->ic->duration)/100;
+	if (cur_stream->ic->start_time != AV_NOPTS_VALUE)
+		ts += cur_stream->ic->start_time;
+	stream_seek(cur_stream, ts, 0, 0);
 }

@@ -8,6 +8,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 #include"ffPlay.h"
+#include "afxcmn.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CTestFFplayDlg dialog
@@ -53,6 +54,8 @@ public:
 	CffPlay m_ffPlay;
 	afx_msg void OnBnClickedBtnpause();
 	afx_msg void OnBnClickedBtnclose();
+	CSliderCtrl m_sliderPlay;
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };
 
 //{{AFX_INSERT_LOCATION}}
