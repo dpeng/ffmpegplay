@@ -2800,10 +2800,16 @@ do_seek:
 			}
 			break;
 		case SDL_VIDEORESIZE:
+			/*
 			screen = SDL_SetVideoMode(event.resize.w, event.resize.h, 0,
 				SDL_HWSURFACE|SDL_RESIZABLE|SDL_ASYNCBLIT|SDL_HWACCEL);
 			screen_width  = cur_stream->width  = event.resize.w;
 			screen_height = cur_stream->height = event.resize.h;
+			*/
+			screen = SDL_SetVideoMode(sdlRc.w, sdlRc.h, 0,
+				SDL_HWSURFACE|SDL_RESIZABLE|SDL_ASYNCBLIT|SDL_HWACCEL);
+			screen_width  = cur_stream->width  = sdlRc.w;
+			screen_height = cur_stream->height = sdlRc.h;
 			cur_stream->force_refresh = 1;
 			break;
 		case SDL_QUIT:
