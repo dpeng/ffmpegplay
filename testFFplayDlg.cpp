@@ -92,6 +92,7 @@ BEGIN_MESSAGE_MAP(CTestFFplayDlg, CDialog)
 	ON_BN_CLICKED(IDC_BTNCLOSE, &CTestFFplayDlg::OnBnClickedBtnclose)
 	ON_WM_TIMER()
 	ON_WM_HSCROLL()
+	ON_BN_CLICKED(IDC_PLAYONLYAUDIO, &CTestFFplayDlg::OnBnClickedPlayonlyaudio)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -132,6 +133,7 @@ BOOL CTestFFplayDlg::OnInitDialog()
 	m_sliderPlay.SetPageSize(5);
 	SetTimer(1,100,NULL) ;
 	m_nPrePlayPosition = 0;
+	m_bOnlyPlayAudio = FALSE;
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
@@ -218,7 +220,7 @@ void CTestFFplayDlg::OnOpenfile()
 		NULL,
 		NULL, 
 		OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
-		_T("mp4 files(*.mp4)|*.mp4||"));
+		_T("mp4 files(*.mp4)|*.mp4|mp3 files(*.mp3)|*.mp3||"));
 	
 	if (FileChooser.DoModal()==IDOK)    tempfilename = FileChooser.GetPathName() ;
 	else    return ;
@@ -276,4 +278,22 @@ void CTestFFplayDlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 	}
 
 	CDialog::OnHScroll(nSBCode, nPos, pScrollBar);
+}
+
+
+void CTestFFplayDlg::OnBnClickedPlayonlyaudio()
+{
+
+	m_bOnlyPlayAudio = !m_bOnlyPlayAudio;
+	if (m_bOnlyPlayAudio)
+	{
+		m_ffPlay.playOnlyAudio(m_bOnlyPlayAudio);
+		GetDlgItem(IDC_PLAYONLYAUDIO)->SetWindowText(_T("audio"));
+	} 
+	else
+	{
+		m_ffPlay.playOnlyAudio(m_bOnlyPlayAudio);
+		GetDlgItem(IDC_PLAYONLYAUDIO)->SetWindowText(_T("video"));
+	}
+	// TODO: Add your control notification handler code here
 }

@@ -12,6 +12,7 @@ public:
 	double playGetTotalTime();
 	double playGetCurrentTime();
 	void playSetSeekPosition(unsigned int pos);
+	void playOnlyAudio(bool isOnlyAudio);
 private:
 	HANDLE m_playFFMpegProcessHandler;
 	static DWORD WINAPI playFFMpegPro(LPVOID pParam);

@@ -422,12 +422,18 @@ static int packet_queue_get(PacketQueue *q, AVPacket *pkt, int block)
 static inline void fill_rectangle(SDL_Surface *screen,
                                   int x, int y, int w, int h, int color)
 {
-    SDL_Rect rect;
-//     rect.x = x;
-//     rect.y = y;
-//     rect.w = w;
-//     rect.h = h;
-	rect = sdlRc;
+	SDL_Rect rect;
+	if (cur_stream->show_mode == SHOW_MODE_WAVES)
+	{
+		rect.x = x;
+		rect.y = y;
+		rect.w = w;
+		rect.h = h;
+	} 
+	else
+	{
+		rect = sdlRc;
+	}
     SDL_FillRect(screen, &rect, color);
 }
 
@@ -664,7 +670,7 @@ static void free_subpicture(SubPicture *sp)
 {
     avsubtitle_free(&sp->sub);
 }
-FILE *stream = NULL;
+
 static void calculate_display_rect(SDL_Rect *rect, int scr_xleft, int scr_ytop, int scr_width, int scr_height, VideoPicture *vp)
 {
     float aspect_ratio;
@@ -2227,7 +2233,7 @@ static int read_thread(void *arg)
     }
     is->refresh_tid = SDL_CreateThread(refresh_thread, is);
     if (is->show_mode == SHOW_MODE_NONE)
-        is->show_mode = ret >= 0 ? SHOW_MODE_VIDEO : SHOW_MODE_RDFT;
+        is->show_mode = ret >= 0 ? SHOW_MODE_VIDEO : SHOW_MODE_WAVES;
 
     if (st_index[AVMEDIA_TYPE_SUBTITLE] >= 0) {
         stream_component_open(is, st_index[AVMEDIA_TYPE_SUBTITLE]);
@@ -2903,6 +2909,7 @@ void CffPlay::playClose()
 	uninit_opts();
 	if (show_status)
 		printf("\n");
+	screen = NULL;
 	SDL_Quit();
 	av_log(NULL, AV_LOG_QUIET, "");
 }
@@ -2946,5 +2953,17 @@ void CffPlay::playSetSeekPosition(unsigned int pos)
 	}
 	else
 	{
+	}
+}
+
+void CffPlay::playOnlyAudio(bool isOnlyAudio)
+{
+	if (isOnlyAudio)
+	{
+		cur_stream->show_mode = SHOW_MODE_WAVES;
+	} 
+	else
+	{
+		cur_stream->show_mode = SHOW_MODE_VIDEO;
 	}
 }
