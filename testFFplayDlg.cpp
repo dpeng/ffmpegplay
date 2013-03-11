@@ -220,7 +220,7 @@ void CTestFFplayDlg::OnOpenfile()
 		NULL,
 		NULL, 
 		OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
-		_T("mp4 files(*.mp4)|*.mp4|mp3 files(*.mp3)|*.mp3||"));
+		_T("mp4 files(*.mp4)|*.mp4|mp3 files(*.mp3)|*.mp3|all files(*.*)|*.*||"));
 	
 	if (FileChooser.DoModal()==IDOK)    tempfilename = FileChooser.GetPathName() ;
 	else    return ;

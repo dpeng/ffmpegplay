@@ -2339,11 +2339,15 @@ static int read_thread(void *arg)
         }
         ret = av_read_frame(ic, pkt);
         if (ret < 0) {
-            if (ret == AVERROR_EOF || url_feof(ic->pb))
+            if (ret == AVERROR_EOF)
 			{
-                eof = 1;
+				eof = 1;
 				is->abort_request = 1;
 				break;
+			}
+			if (url_feof(ic->pb))
+			{
+				eof = 1;
 			}
             if (ic->pb && ic->pb->error)
                 break;
