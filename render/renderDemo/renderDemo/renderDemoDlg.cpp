@@ -63,6 +63,7 @@ BEGIN_MESSAGE_MAP(CrenderDemoDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 
@@ -98,7 +99,12 @@ BOOL CrenderDemoDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
 	// TODO: Add extra initialization here
-
+	m_audioFileName = _T("d:\\sys_audio.pcm");
+	m_videoFileName = _T("d:\\sys_video.yuv");
+	m_nWidth = 704;
+	m_nHight = 576;
+	UpdateData(false);
+	startPlay();
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
@@ -151,3 +157,87 @@ HCURSOR CrenderDemoDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+void CrenderDemoDlg::startPlay()
+{
+	UpdateData(true);
+	RECT rc;
+	GetDlgItem(IDC_STATIC_PLAY)->GetWindowRect(&rc);
+	int initRet = render_init((long)GetDlgItem(IDC_STATIC_PLAY)->GetSafeHwnd());
+	int openRet = render_open(0, GetDlgItem(IDC_STATIC_PLAY)->GetSafeHwnd(), 704, 576, NULL, NULL, ByDDOffscreen, NULL);
+	SetTimer(1,40,NULL);
+}
+
+FILE *fpVideo = NULL;
+FILE *fpAudio = NULL;
+#define AUDIO_SIZE 1024*4
+void CrenderDemoDlg::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: Add your message handler code here and/or call default
+
+	if (fpVideo == NULL)
+	{
+		if ((fpVideo = fopen(m_videoFileName,"rb")) != NULL)
+		{
+			m_bufvideo = new unsigned char[m_nWidth*m_nHight*3/2];
+			memset(m_bufvideo , 0 , m_nWidth * m_nHight * 3 / 2);
+		}
+		else
+		{
+			KillTimer(1);
+			return;
+		}
+	}
+	if (fpAudio == NULL)
+	{
+		if ((fpAudio = fopen(m_audioFileName,"rb")) != NULL)
+		{
+			m_bufaudio = new unsigned char[AUDIO_SIZE];
+			memset(m_bufaudio , 0 , AUDIO_SIZE);
+		}
+		else
+		{
+			KillTimer(1);
+			return;
+		}
+	}
+	fread(m_bufvideo, 1, m_nWidth*m_nHight*3/2, fpVideo);
+	fread(m_bufaudio, 1, AUDIO_SIZE, fpAudio);
+	if (feof(fpVideo))
+	{
+		stopPlay();
+		MessageBox("File End", "Fuck", MB_OK);
+		return;
+	}
+	RECT rc;
+	GetDlgItem(IDC_STATIC_PLAY)->GetWindowRect(&rc);
+	int renderVideoRet = render_video(0, m_bufvideo, m_bufvideo + m_nHight*m_nWidth, m_bufvideo + m_nHight*m_nWidth*5/4, 704, 576);
+	int renderAudioRet = render_audio(0, m_bufaudio, AUDIO_SIZE, 8, 16000);
+	CDialogEx::OnTimer(nIDEvent);
+}
+
+void CrenderDemoDlg::stopPlay()
+{
+	KillTimer(1);
+	if (fpVideo)
+	{
+		fclose(fpVideo);
+		fpVideo = NULL;
+	}
+	if (m_bufvideo)
+	{
+		delete m_bufvideo;
+		m_bufvideo = NULL;
+	}
+	if (fpAudio)
+	{
+		fclose(fpAudio);
+		fpAudio = NULL;
+	}
+	if (m_bufaudio)
+	{
+		delete m_bufaudio;
+		m_bufaudio = NULL;
+	}
+	render_close_all();
+	GetDlgItem(IDC_STATIC_PLAY)->RedrawWindow();
+}

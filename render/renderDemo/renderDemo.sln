@@ -1,7 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "renderDemo", "renderDemo\renderDemo.vcxproj", "{3369968E-CC72-4084-BC45-E57915AD78D9}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "renderDemo", "renderDemo\renderDemo.vcxproj", "{4D1A08E0-9334-4EFA-8C35-6DEE4E97CA7B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{82AAF3BB-DE11-21B0-F37C-02012117E364} = {82AAF3BB-DE11-21B0-F37C-02012117E364}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "render", "..\SRC\render.vcxproj", "{82AAF3BB-DE11-21B0-F37C-02012117E364}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -9,10 +14,14 @@ Global
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{3369968E-CC72-4084-BC45-E57915AD78D9}.Debug|Win32.ActiveCfg = Debug|Win32
-		{3369968E-CC72-4084-BC45-E57915AD78D9}.Debug|Win32.Build.0 = Debug|Win32
-		{3369968E-CC72-4084-BC45-E57915AD78D9}.Release|Win32.ActiveCfg = Release|Win32
-		{3369968E-CC72-4084-BC45-E57915AD78D9}.Release|Win32.Build.0 = Release|Win32
+		{4D1A08E0-9334-4EFA-8C35-6DEE4E97CA7B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4D1A08E0-9334-4EFA-8C35-6DEE4E97CA7B}.Debug|Win32.Build.0 = Debug|Win32
+		{4D1A08E0-9334-4EFA-8C35-6DEE4E97CA7B}.Release|Win32.ActiveCfg = Release|Win32
+		{4D1A08E0-9334-4EFA-8C35-6DEE4E97CA7B}.Release|Win32.Build.0 = Release|Win32
+		{82AAF3BB-DE11-21B0-F37C-02012117E364}.Debug|Win32.ActiveCfg = Debug|Win32
+		{82AAF3BB-DE11-21B0-F37C-02012117E364}.Debug|Win32.Build.0 = Debug|Win32
+		{82AAF3BB-DE11-21B0-F37C-02012117E364}.Release|Win32.ActiveCfg = Release|Win32
+		{82AAF3BB-DE11-21B0-F37C-02012117E364}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

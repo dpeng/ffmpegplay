@@ -1,5 +1,5 @@
 #include "pcmrender.h"
-#include "..\..\..\..\DecodeSdk\Trunk\SRC\global.h"
+//#include "..\..\..\..\DecodeSdk\Trunk\SRC\global.h"
 
 #include <process.h> 
 #include <string.h>
@@ -294,7 +294,7 @@ int CSoundChannel_Win32::write(unsigned char *pcm, int len)
 		DWORD flags = m_buffer[m_bufferIndex].header.dwFlags;
 		while ((flags&WHDR_DONE) == 0) {
 
-			dbg_print(100,"AUDIO BUFFER OVERFLOW.\n");	
+			//dbg_print(100,"AUDIO BUFFER OVERFLOW.\n");	
 
 			ReleaseMutex(m_mutex);
 

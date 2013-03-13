@@ -3,7 +3,7 @@
 
 #include "render.h"
 #include "manager.h"
-#include "..\..\..\..\DecodeSdk\Trunk\SRC\global.h"
+//#include "..\..\..\..\DecodeSdk\Trunk\SRC\global.h"
 
 static char modulePath[256];
 

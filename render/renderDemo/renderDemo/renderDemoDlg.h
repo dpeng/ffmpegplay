@@ -1,7 +1,7 @@
 
 // renderDemoDlg.h : header file
 //
-
+#include "../../SRC/render.h"
 #pragma once
 
 
@@ -29,4 +29,18 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+private:
+	unsigned char* m_bufvideo;
+	unsigned char* m_bufaudio;
+	unsigned char* m_py; 
+	unsigned char* m_pu;
+	unsigned char* m_pv;
+	int m_nWidth;
+	int m_nHight;
+	CString m_videoFileName;
+	CString m_audioFileName;
+	void startPlay();
+	void stopPlay();
+public:
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };
