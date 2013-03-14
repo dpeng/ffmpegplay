@@ -72,7 +72,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>./SDL;./ffmpeg;./ffmpeg/libavutil;./ffmpeg/libavcodec;./ffmpeg/libavdevice;./ffmpeg/libavfilter;./ffmpeg/libavformat;./ffmpeg/libpostproc;./ffmpeg/libswscale;./ffmpeg/libswresample;./ffmpeg/compat;./ffmpeg/libavresample;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./directShow;./ffmpeg;./ffmpeg/libavutil;./ffmpeg/libavcodec;./ffmpeg/libavdevice;./ffmpeg/libavfilter;./ffmpeg/libavformat;./ffmpeg/libpostproc;./ffmpeg/libswscale;./ffmpeg/libswresample;./ffmpeg/compat;./ffmpeg/libavresample;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -90,10 +90,10 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>nafxcwd.lib;SDL.lib;avcodec.lib;avformat.lib;avutil.lib;swscale.lib;avdevice.lib;avfilter.lib;swresample.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>nafxcwd.lib;render.lib;avcodec.lib;avformat.lib;avutil.lib;swscale.lib;avdevice.lib;avfilter.lib;swresample.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>.\Debug/testFFplay.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>./SDL;./ffmpeg;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>./directShow;./ffmpeg;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>nafxcwd.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\Debug/testFFplay.pdb</ProgramDatabaseFile>

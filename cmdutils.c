@@ -65,6 +65,7 @@ const int this_year = 2012;
 
 static FILE *report_file;
 
+const char program_name[] = "ffplay";
 void init_opts(void)
 {
 
@@ -1627,4 +1628,14 @@ void free_buffer_pool(FrameBuffer **pool)
         av_free(buf);
         buf = *pool;
     }
+}
+
+void show_help_default(const char *opt, const char *arg)
+{
+
+}
+
+void exit_program(int ret)
+{
+	exit(ret);
 }

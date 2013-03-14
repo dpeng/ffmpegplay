@@ -134,6 +134,7 @@ BOOL CTestFFplayDlg::OnInitDialog()
 	SetTimer(1,100,NULL) ;
 	m_nPrePlayPosition = 0;
 	m_bOnlyPlayAudio = FALSE;
+	OnBtnplay();
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
@@ -192,9 +193,10 @@ void CTestFFplayDlg::OnBtnplay()
 	RECT rc = {0};
 	GetDlgItem(IDC_STATIC_PLAT)->GetWindowRect(&rc);
 	
-	char variable[256];
-	sprintf(variable, "SDL_WINDOWID=0x%lx", GetDlgItem(IDC_STATIC_PLAT)->GetSafeHwnd());
-	m_ffPlay.playMpegFile(m_strFileName.GetBuffer(0), &rc, variable);
+	//char variable[256];
+//	sprintf(variable, "SDL_WINDOWID=0x%lx", GetDlgItem(IDC_STATIC_PLAT)->GetSafeHwnd());
+	m_strFileName = _T("d:\\other\\stream\\river.mp4");
+	m_ffPlay.playMpegFile(m_strFileName.GetBuffer(0), GetDlgItem(IDC_STATIC_PLAT)->GetSafeHwnd());
 }
 
 BOOL CTestFFplayDlg::Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID, CCreateContext* pContext) 
@@ -254,7 +256,7 @@ void CTestFFplayDlg::OnClose()
 void CTestFFplayDlg::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
-	m_sliderPlay.SetPos(m_ffPlay.playGetCurrentTime()*100/m_ffPlay.playGetTotalTime());
+	m_sliderPlay.SetPos((int)(m_ffPlay.playGetCurrentTime()*100/m_ffPlay.playGetTotalTime()));
 	m_nPrePlayPosition = m_sliderPlay.GetPos();
 	CDialog::OnTimer(nIDEvent);
 }
