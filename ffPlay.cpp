@@ -9,76 +9,80 @@ CffPlay::~CffPlay(void)
 {
 	m_playFFMpegProcessHandler = NULL;
 }
-
+#if 0
 FILE* f_video ;
+f_video = fopen("D:\\123.yuv","w+b") ;
+fwrite(frame->base[0], (frame->width)*(frame->height)*3/2, 1, f_video);
+#endif
 DWORD CffPlay::playFFMpegPro(LPVOID pParam)  
 {
 	CffPlay* pThis = (CffPlay*)pParam;
 	AVPacket pkt1, *pkt = &pkt1;
 	VideoState *is = &(pThis->m_currentStream);
-	f_video = fopen("D:\\123.yuv","w+b") ;
+	AVFrame *frame = avcodec_alloc_frame();
+	int pts;
+	int height = is->ic->streams[is->video_stream]->codec->height;  
+	int width = is->ic->streams[is->video_stream]->codec->width;  
+	unsigned char *buf = new unsigned char[height*width*3/2]; 
 	while(1)
 	{
 		int eof = 0;
-		if (is->video_stream >= 0) 
-		{
-			av_init_packet(pkt);
-			pkt->data = NULL;
-			pkt->size = 0;
-			pkt->stream_index = is->video_stream;
-		}
-		/*
-		if (is->audio_stream >= 0 &&
-			is->audio_st->codec->codec->capabilities & CODEC_CAP_DELAY) {
-				av_init_packet(pkt);
-				pkt->data = NULL;
-				pkt->size = 0;
-				pkt->stream_index = is->audio_stream;
-		}
-		*/
+
+		(void)memset(pkt, 0, sizeof(pkt));
+		(void)memset(frame, 0, sizeof(frame));
 		int ret = av_read_frame(is->ic, pkt);
 		if (ret == AVERROR_EOF)
 		{
 			eof = 1;
 			break;
 		}
-		AVFrame *frame = avcodec_alloc_frame();
-		int pts;
-		AVPicture pict = { { 0 } };
 		avcodec_get_frame_defaults(frame);
-		if(avcodec_decode_video2(is->video_st->codec, frame, &pts, pkt) < 0)
-			continue;
-		//fwrite(frame->base[0], (frame->width)*(frame->height)*3/2, 1, f_video);
-		Sleep(400); 
+		if (pkt->stream_index == is->video_stream)
+		{
+			if(avcodec_decode_video2(is->video_st->codec, frame, &pts, pkt) < 0)
+				continue;
+			if(frame->data[0] == NULL)
+				continue;
+			Sleep(39); 
+			
+			int a=0,i;   
+			(void)memset(buf, 0, sizeof(buf));
+			for (i=0; i<height; i++)   
+			{   
+				memcpy(buf+a,frame->data[0] + i * frame->linesize[0], width);   
+				a+=width;   
+			}   
+			for (i=0; i<height/2; i++)   
+			{   
+				memcpy(buf+a,frame->data[1] + i * frame->linesize[1], width/2);   
+				a+=width/2;   
+			}   
+			for (i=0; i<height/2; i++)   
+			{   
+				memcpy(buf+a,frame->data[2] + i * frame->linesize[2], width/2);   
+				a+=width/2;   
+			}  
 
-		int height = frame->height;  
-		int width = frame->width;  
-		unsigned char *buf = new unsigned char[height*width*3/2]; 
-
-
-		int a=0,i;   
-		for (i=0; i<height; i++)   
-		{   
-			memcpy(buf+a,frame->data[0] + i * frame->linesize[0], width);   
-			a+=width;   
-		}   
-		for (i=0; i<height/2; i++)   
-		{   
-			memcpy(buf+a,frame->data[1] + i * frame->linesize[1], width/2);   
-			a+=width/2;   
-		}   
-		for (i=0; i<height/2; i++)   
-		{   
-			memcpy(buf+a,frame->data[2] + i * frame->linesize[2], width/2);   
-			a+=width/2;   
-		}  
-
-		int renderVideoRet = render_video(0, buf, buf+width*height, buf+width*height*5/4, width, height);
-		delete [] buf;  
-		av_free_packet(pkt);
-		avcodec_free_frame(&frame);
+			int renderVideoRet = render_video(0, buf, buf+width*height, buf+width*height*5/4, width, height);
+		}
+		if (pkt->stream_index == is->audio_stream)
+		{
+			if (avcodec_decode_audio4(is->audio_st->codec, frame, &pts, pkt) < 0)
+			{
+				continue;
+			}
+			int data_size = av_samples_get_buffer_size(NULL, is->audio_st->codec->channels,
+				frame->nb_samples,
+				is->audio_st->codec->sample_fmt, 0);
+			(void)memset(buf, 0, sizeof(buf));
+			memcpy(buf, frame->data[0], data_size);   
+			int renderAudioRet = render_audio(0, buf, data_size, 16, frame->sample_rate);
+		}
 
 	}
+	delete [] buf;  
+	av_free_packet(pkt);
+	avcodec_free_frame(&frame);
 	return 0;
 }
 /* Called from the main */

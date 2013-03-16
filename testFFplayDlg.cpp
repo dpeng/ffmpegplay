@@ -134,7 +134,8 @@ BOOL CTestFFplayDlg::OnInitDialog()
 	SetTimer(1,100,NULL) ;
 	m_nPrePlayPosition = 0;
 	m_bOnlyPlayAudio = FALSE;
-	OnBtnplay();
+	OnOpenfile();
+	//OnBtnplay();
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
@@ -195,7 +196,7 @@ void CTestFFplayDlg::OnBtnplay()
 	
 	//char variable[256];
 //	sprintf(variable, "SDL_WINDOWID=0x%lx", GetDlgItem(IDC_STATIC_PLAT)->GetSafeHwnd());
-	m_strFileName = _T("d:\\other\\stream\\river.mp4");
+	//m_strFileName = _T("d:\\other\\stream\\river.mp4");
 	m_ffPlay.playMpegFile(m_strFileName.GetBuffer(0), GetDlgItem(IDC_STATIC_PLAT)->GetSafeHwnd());
 }
 
