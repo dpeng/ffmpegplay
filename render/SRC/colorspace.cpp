@@ -257,7 +257,7 @@ color_convert_func ccfunc[4] = {
 	0
 };
 
-#define MAXIMUM_Y_WIDTH 800
+#define MAXIMUM_Y_WIDTH 1280
 
 #define int8_t   char
 #define uint8_t  unsigned char
