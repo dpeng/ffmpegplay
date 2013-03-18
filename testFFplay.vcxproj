@@ -72,7 +72,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>./directShow;./ffmpeg;./ffmpeg/libavutil;./ffmpeg/libavcodec;./ffmpeg/libavdevice;./ffmpeg/libavfilter;./ffmpeg/libavformat;./ffmpeg/libpostproc;./ffmpeg/libswscale;./ffmpeg/libswresample;./ffmpeg/compat;./ffmpeg/libavresample;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./directShow;./ffmpeg;./ffmpeg/libavutil;./ffmpeg/libavcodec;./ffmpeg/libavdevice;./ffmpeg/libavfilter;./ffmpeg/libavformat;./ffmpeg/libpostproc;./ffmpeg/libswscale;./ffmpeg/libswresample;./ffmpeg/compat;./ffmpeg/libavresample;./fifoBuffer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -158,6 +158,7 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="ffPlay.cpp" />
+    <ClCompile Include="fifoBuffer\FifoBuffer.cpp" />
     <ClCompile Include="StdAfx.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -185,6 +186,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ffPlay.h" />
+    <ClInclude Include="fifoBuffer\FifoBuffer.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="testFFplay.h" />

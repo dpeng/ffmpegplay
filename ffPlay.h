@@ -5,12 +5,17 @@
 #include <tchar.h>
 #include <stdio.h>
 #include <atlstr.h>
+#include "FifoBuffer.h"
 extern "C" 
 {
 #include "avcodec.h"
 #include "avformat.h"
 #include "cmdutils.h "
 }
+
+#define MAX_FRAME_BUFFER_SIZE 15
+#define MAX_IMAGE_WIDTH 1280
+#define MAX_IMAGE_HEIGHT 720
 typedef struct VideoState {
 	AVStream *audio_st;
 	AVStream *video_st;
@@ -34,8 +39,13 @@ public:
 	void playOnlyAudio(BOOL isOnlyAudio);
 private:
 	AVPacket m_flushPkt;
-	HANDLE m_playFFMpegProcessHandler;
+	HANDLE m_ffmpegDecHandler;
+	HANDLE m_ffmpegRenderHandler;
 	VideoState m_currentStream;
-	static DWORD WINAPI playFFMpegPro(LPVOID pParam);
+	AVFrameBuffer* m_item ;
+	FifoBuffer m_YuvDataList;
+	FifoBuffer m_PcmDataList;
+	static DWORD WINAPI ffmpegDecPro(LPVOID pParam);
+	static DWORD WINAPI ffmpegRenderPro(LPVOID pParam);
 	int stream_component_open(VideoState *is, int stream_index);
 };

@@ -2,27 +2,55 @@
 
 CffPlay::CffPlay(void)
 {
-	m_playFFMpegProcessHandler = NULL;
+	m_ffmpegDecHandler = NULL;
+	m_YuvDataList.clear();
+	m_YuvDataList.init(MAX_FRAME_BUFFER_SIZE, MAX_IMAGE_WIDTH*MAX_IMAGE_HEIGHT*3/2);
+	m_PcmDataList.clear();
+	m_PcmDataList.init(MAX_FRAME_BUFFER_SIZE, AUDIOBUFLEN);
+	m_item = new AVFrameBuffer ;
+	memset(m_item, 0, sizeof(AVFrameBuffer));
 }
 
 CffPlay::~CffPlay(void)
 {
-	m_playFFMpegProcessHandler = NULL;
+	m_ffmpegDecHandler = NULL;
+	m_YuvDataList.clear();
+	m_PcmDataList.clear();
+	delete m_item;
+	m_item = NULL;
+}
+DWORD CffPlay::ffmpegRenderPro(LPVOID pParam) 
+{
+	CffPlay* pThis = (CffPlay*)pParam;
+	while(1)
+	{
+		//Sleep(10);
+		pThis->m_YuvDataList.read(pThis->m_item);
+		int renderVideoRet = render_video(0, pThis->m_item->context, 
+			pThis->m_item->context + pThis->m_item->width*pThis->m_item->height, 
+			pThis->m_item->context +pThis->m_item->width*pThis->m_item->height*5/4, 
+			pThis->m_item->width, 
+			pThis->m_item->height);
+
+		pThis->m_PcmDataList.read(pThis->m_item);
+		int renderAudioRet = render_audio(0, pThis->m_item->context, pThis->m_item->frameLen, 16, pThis->m_item->sampleRate);
+	}
+
 }
 #if 0
 FILE* f_video ;
 f_video = fopen("D:\\123.yuv","w+b") ;
 fwrite(frame->base[0], (frame->width)*(frame->height)*3/2, 1, f_video);
 #endif
-DWORD CffPlay::playFFMpegPro(LPVOID pParam)  
+DWORD CffPlay::ffmpegDecPro(LPVOID pParam)  
 {
 	CffPlay* pThis = (CffPlay*)pParam;
 	AVPacket pkt1, *pkt = &pkt1;
 	VideoState *is = &(pThis->m_currentStream);
 	AVFrame *frame = avcodec_alloc_frame();
 	int pts;
-	int height = is->ic->streams[is->video_stream]->codec->height;  
-	int width = is->ic->streams[is->video_stream]->codec->width;  
+	int height = MAX_IMAGE_HEIGHT;  
+	int width = MAX_IMAGE_WIDTH;  
 	unsigned char *buf = new unsigned char[height*width*3/2]; 
 	while(1)
 	{
@@ -43,10 +71,11 @@ DWORD CffPlay::playFFMpegPro(LPVOID pParam)
 				continue;
 			if(frame->data[0] == NULL)
 				continue;
-			Sleep(39); 
 			
 			int a=0,i;   
 			(void)memset(buf, 0, sizeof(buf));
+			height = is->ic->streams[is->video_stream]->codec->height;  
+			width = is->ic->streams[is->video_stream]->codec->width;  
 			for (i=0; i<height; i++)   
 			{   
 				memcpy(buf+a,frame->data[0] + i * frame->linesize[0], width);   
@@ -63,7 +92,15 @@ DWORD CffPlay::playFFMpegPro(LPVOID pParam)
 				a+=width/2;   
 			}  
 
-			int renderVideoRet = render_video(0, buf, buf+width*height, buf+width*height*5/4, width, height);
+			//int renderVideoRet = render_video(0, buf, buf+width*height, buf+width*height*5/4, width, height);
+			pThis->m_item->context = buf;
+			pThis->m_item->width = width;
+			pThis->m_item->height = height;
+			pThis->m_item->frameType = pkt->stream_index;
+			while (pThis->m_YuvDataList.write(pThis->m_item) == false)
+			{
+				Sleep(10);
+			}
 		}
 		if (pkt->stream_index == is->audio_stream)
 		{
@@ -76,7 +113,15 @@ DWORD CffPlay::playFFMpegPro(LPVOID pParam)
 				is->audio_st->codec->sample_fmt, 0);
 			(void)memset(buf, 0, sizeof(buf));
 			memcpy(buf, frame->data[0], data_size);   
-			int renderAudioRet = render_audio(0, buf, data_size, 16, frame->sample_rate);
+			//int renderAudioRet = render_audio(0, buf, data_size, 16, frame->sample_rate);
+			pThis->m_item->context = buf;
+			pThis->m_item->frameLen = data_size;
+			pThis->m_item->sampleRate = frame->sample_rate;
+			pThis->m_item->frameType = pkt->stream_index;
+			while (pThis->m_PcmDataList.write(pThis->m_item) == false)
+			{
+				Sleep(10);
+			}
 		}
 
 	}
@@ -118,7 +163,8 @@ void CffPlay::playMpegFile(char* fileName, HWND hWnd)
 	int openRet = render_open(0, hWnd, 704, 576, NULL, NULL, ByDDOffscreen, NULL);
 
 	DWORD dw;
-	m_playFFMpegProcessHandler = CreateThread(NULL,0,CffPlay::playFFMpegPro,this,0,&dw);
+	m_ffmpegDecHandler = CreateThread(NULL,0,CffPlay::ffmpegDecPro,this,0,&dw);
+	m_ffmpegRenderHandler = CreateThread(NULL,0,CffPlay::ffmpegRenderPro,this,0,&dw);
 	return;
 }
 
@@ -129,8 +175,8 @@ void CffPlay::playPause()
 
 void CffPlay::playClose()
 {
-	CloseHandle(m_playFFMpegProcessHandler);
-	m_playFFMpegProcessHandler = NULL;
+	CloseHandle(m_ffmpegDecHandler);
+	m_ffmpegDecHandler = NULL;
 }
 
 double CffPlay::playGetTotalTime()

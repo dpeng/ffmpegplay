@@ -13,6 +13,9 @@
       <UniqueIdentifier>{c35d6f2c-73ed-418a-9eec-016bc61c7052}</UniqueIdentifier>
       <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
     </Filter>
+    <Filter Include="fifoBuffer">
+      <UniqueIdentifier>{f30bd70c-a955-4c2e-9b5a-1748ae5744f9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cmdutils.c">
@@ -29,6 +32,9 @@
     </ClCompile>
     <ClCompile Include="testFFplayDlg.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fifoBuffer\FifoBuffer.cpp">
+      <Filter>fifoBuffer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -51,6 +57,9 @@
     </ClInclude>
     <ClInclude Include="testFFplayDlg.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fifoBuffer\FifoBuffer.h">
+      <Filter>fifoBuffer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
