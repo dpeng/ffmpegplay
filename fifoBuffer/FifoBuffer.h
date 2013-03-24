@@ -2,7 +2,7 @@
 #define FIFOBUFFER_H
 #include <windows.h>
 
-#define  AUDIOBUFLEN (8192*2)
+#define  AUDIOBUFLEN (8*65536)
 struct AVFrameBuffer 
 {
 	AVFrameBuffer *prev;

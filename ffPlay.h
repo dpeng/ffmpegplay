@@ -23,6 +23,7 @@ typedef struct VideoState {
 	int video_stream;
 	int audio_stream;
 	SwsContext *img_convert_ctx;
+	double video_current_pts;
 } VideoState;
 
 class CffPlay
@@ -45,7 +46,10 @@ private:
 	AVFrameBuffer* m_item ;
 	FifoBuffer m_YuvDataList;
 	FifoBuffer m_PcmDataList;
+	HWND m_hWnd;
+	BOOL m_bDirectDrawInited;
 	static DWORD WINAPI ffmpegDecPro(LPVOID pParam);
 	static DWORD WINAPI ffmpegRenderPro(LPVOID pParam);
 	int stream_component_open(VideoState *is, int stream_index);
+	inline int initDirectDraw(HWND hWnd, int nWidth, int nHight);
 };

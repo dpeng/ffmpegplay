@@ -3,25 +3,32 @@
 CffPlay::CffPlay(void)
 {
 	m_ffmpegDecHandler = NULL;
+	m_ffmpegRenderHandler = NULL;
 	m_YuvDataList.clear();
 	m_YuvDataList.init(MAX_FRAME_BUFFER_SIZE, MAX_IMAGE_WIDTH*MAX_IMAGE_HEIGHT*3/2);
 	m_PcmDataList.clear();
 	m_PcmDataList.init(MAX_FRAME_BUFFER_SIZE, AUDIOBUFLEN);
 	m_item = new AVFrameBuffer ;
 	memset(m_item, 0, sizeof(AVFrameBuffer));
+	m_hWnd = NULL;
+	m_bDirectDrawInited = FALSE;
 }
 
 CffPlay::~CffPlay(void)
 {
 	m_ffmpegDecHandler = NULL;
+	m_ffmpegRenderHandler = NULL;
 	m_YuvDataList.clear();
 	m_PcmDataList.clear();
 	delete m_item;
 	m_item = NULL;
+	m_hWnd = NULL;
+	m_bDirectDrawInited = FALSE;
 }
 DWORD CffPlay::ffmpegRenderPro(LPVOID pParam) 
 {
 	CffPlay* pThis = (CffPlay*)pParam;
+	VideoState *is = &(pThis->m_currentStream);
 	while(1)
 	{
 		//Sleep(10);
@@ -31,17 +38,23 @@ DWORD CffPlay::ffmpegRenderPro(LPVOID pParam)
 			pThis->m_item->context +pThis->m_item->width*pThis->m_item->height*5/4, 
 			pThis->m_item->width, 
 			pThis->m_item->height);
+		if (renderVideoRet < 0)
+		{
+			Sleep(10);
+		}
 
 		pThis->m_PcmDataList.read(pThis->m_item);
-		int renderAudioRet = render_audio(0, pThis->m_item->context, pThis->m_item->frameLen, 16, pThis->m_item->sampleRate);
+		int renderAudioRet = render_audio(0, pThis->m_item->context, pThis->m_item->frameLen, 
+			is->audio_st->codec->sample_fmt*is->audio_st->codec->channels*8, pThis->m_item->sampleRate);
+		//int sampling = is->audio_st->codec->sample_rate * is->audio_st->codec->channels * av_get_bytes_per_sample(is->audio_st->codec->sample_fmt);
+		if (renderAudioRet < 0)
+		{
+			Sleep(10);
+		}
 	}
 
 }
-#if 0
-FILE* f_video ;
-f_video = fopen("D:\\123.yuv","w+b") ;
-fwrite(frame->base[0], (frame->width)*(frame->height)*3/2, 1, f_video);
-#endif
+
 DWORD CffPlay::ffmpegDecPro(LPVOID pParam)  
 {
 	CffPlay* pThis = (CffPlay*)pParam;
@@ -71,12 +84,17 @@ DWORD CffPlay::ffmpegDecPro(LPVOID pParam)
 				continue;
 			if(frame->data[0] == NULL)
 				continue;
-			
 			int a=0,i;   
 			(void)memset(buf, 0, sizeof(buf));
 			height = is->ic->streams[is->video_stream]->codec->height;  
-			width = is->ic->streams[is->video_stream]->codec->width;  
-			for (i=0; i<height; i++)   
+			width = is->ic->streams[is->video_stream]->codec->width; 
+			if (!pThis->m_bDirectDrawInited)
+			{
+				pThis->m_bDirectDrawInited = TRUE;
+				pThis->initDirectDraw(pThis->m_hWnd, width, height);
+			} 
+			is->video_current_pts = av_frame_get_best_effort_timestamp(frame)*av_q2d(is->video_st->time_base);
+			for (i=0; i<height; i++)
 			{   
 				memcpy(buf+a,frame->data[0] + i * frame->linesize[0], width);   
 				a+=width;   
@@ -92,7 +110,6 @@ DWORD CffPlay::ffmpegDecPro(LPVOID pParam)
 				a+=width/2;   
 			}  
 
-			//int renderVideoRet = render_video(0, buf, buf+width*height, buf+width*height*5/4, width, height);
 			pThis->m_item->context = buf;
 			pThis->m_item->width = width;
 			pThis->m_item->height = height;
@@ -108,12 +125,16 @@ DWORD CffPlay::ffmpegDecPro(LPVOID pParam)
 			{
 				continue;
 			}
-			int data_size = av_samples_get_buffer_size(NULL, is->audio_st->codec->channels,
+			int data_size = av_samples_get_buffer_size(NULL, 
+				is->audio_st->codec->channels,
 				frame->nb_samples,
-				is->audio_st->codec->sample_fmt, 0);
+				is->audio_st->codec->sample_fmt, 1);
+			if (data_size <= 0)
+			{
+				continue;
+			}
 			(void)memset(buf, 0, sizeof(buf));
 			memcpy(buf, frame->data[0], data_size);   
-			//int renderAudioRet = render_audio(0, buf, data_size, 16, frame->sample_rate);
 			pThis->m_item->context = buf;
 			pThis->m_item->frameLen = data_size;
 			pThis->m_item->sampleRate = frame->sample_rate;
@@ -126,6 +147,7 @@ DWORD CffPlay::ffmpegDecPro(LPVOID pParam)
 
 	}
 	delete [] buf;  
+	pThis->m_bDirectDrawInited = FALSE;
 	av_free_packet(pkt);
 	avcodec_free_frame(&frame);
 	return 0;
@@ -158,9 +180,7 @@ void CffPlay::playMpegFile(char* fileName, HWND hWnd)
 	stream_component_open(&m_currentStream, st_index[AVMEDIA_TYPE_VIDEO]);
 	stream_component_open(&m_currentStream, st_index[AVMEDIA_TYPE_AUDIO]);
 
-
-	int initRet = render_init((long)hWnd);
-	int openRet = render_open(0, hWnd, 704, 576, NULL, NULL, ByDDOffscreen, NULL);
+	m_hWnd = hWnd;
 
 	DWORD dw;
 	m_ffmpegDecHandler = CreateThread(NULL,0,CffPlay::ffmpegDecPro,this,0,&dw);
@@ -177,13 +197,18 @@ void CffPlay::playClose()
 {
 	CloseHandle(m_ffmpegDecHandler);
 	m_ffmpegDecHandler = NULL;
+	CloseHandle(m_ffmpegRenderHandler);
+	m_ffmpegRenderHandler = NULL;
+	m_hWnd = NULL;
+	m_bDirectDrawInited = FALSE;
 }
 
 double CffPlay::playGetTotalTime()
 {
 	/*
 	double totalTimeInSec;
-	if ((NULL != cur_stream) && (NULL != cur_stream->ic))
+	if ((NULL != cur_stream) && 
+	m_hWnd = NULL;am->ic))
 	{
 		totalTimeInSec = cur_stream->ic->duration / AV_TIME_BASE;
 	} 
@@ -282,4 +307,41 @@ int CffPlay::stream_component_open(VideoState *is, int stream_index)
         break;
     }
     return 0;
+}
+
+inline int CffPlay::initDirectDraw(HWND hWnd, int nWidth, int nHight)
+{
+	int initRet = render_init((long)hWnd);
+	if (initRet < 0)
+	{
+		return RENDER_ERR_FATAL;
+	} 
+	else
+	{
+		initRet = render_open(0, hWnd, nWidth, nHight, NULL, NULL, ByDDOffscreen, NULL);
+		if (initRet < 0)
+		{
+			initRet = render_open(0, hWnd, nWidth, nHight, NULL, NULL, ByDDOverlay, NULL);
+			if (initRet < 0)
+			{
+				initRet = render_open(0, hWnd, nWidth, nHight, NULL, NULL, ByGDI, NULL);
+				if (initRet < 0)
+				{
+					return RENDER_ERR_FATAL;
+				} 
+				else
+				{
+					return RENDER_ERR_NOERROR;
+				}
+			} 
+			else
+			{
+				return RENDER_ERR_NOERROR;
+			}
+		} 
+		else
+		{
+			return RENDER_ERR_NOERROR;
+		}
+	}
 }
