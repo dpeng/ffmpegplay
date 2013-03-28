@@ -2,7 +2,7 @@
 #define FIFOBUFFER_H
 #include <windows.h>
 
-#define  AUDIOBUFLEN (8*65536)
+#define  AUDIOBUFLEN (8*1024)
 struct AVFrameBuffer 
 {
 	AVFrameBuffer *prev;
@@ -11,7 +11,6 @@ struct AVFrameBuffer
 	int width ;
 	int height ;
 	int size;
-	//Frame bit rate
 	int frameLen;
 	int frameType;
 	int sampleRate;
