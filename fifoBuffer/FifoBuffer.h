@@ -14,6 +14,7 @@ struct AVFrameBuffer
 	int frameLen;
 	int frameType;
 	int sampleRate;
+	double pts;
 };
 
 class FifoBuffer 

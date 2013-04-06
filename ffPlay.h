@@ -14,8 +14,8 @@ extern "C"
 }
 
 #define MAX_FRAME_BUFFER_SIZE 50
-#define MAX_IMAGE_WIDTH 1280
-#define MAX_IMAGE_HEIGHT 720
+#define MAX_IMAGE_WIDTH 1920
+#define MAX_IMAGE_HEIGHT 1280
 typedef struct PacketQueue {
 	AVPacketList *first_pkt, *last_pkt;
 	int nb_packets;
@@ -51,15 +51,19 @@ public:
 private:
 	AVPacket m_flushPkt;
 	HANDLE m_hreadProcess;
-	HANDLE m_ffmpegDecHandler;
+	HANDLE m_videoDecHandler;
+	HANDLE m_audioDecHandler;
 	HANDLE m_ffmpegRenderHandler;
 	VideoState m_currentStream;
-	AVFrameBuffer* m_item ;
-	FifoBuffer m_AvDataList;
+	AVFrameBuffer* m_videoItem ;
+	AVFrameBuffer* m_audioItem ;
+	FifoBuffer m_videoDataList;
+	FifoBuffer m_audioDataList;
 	HWND m_hWnd;
 	BOOL m_bDirectDrawInited;
 	static DWORD WINAPI ffmpegReadPro(LPVOID pParam);
-	static DWORD WINAPI ffmpegDecPro(LPVOID pParam);
+	static DWORD WINAPI videoDecPro(LPVOID pParam);
+	static DWORD WINAPI audioDecPro(LPVOID pParam);
 	static DWORD WINAPI ffmpegRenderPro(LPVOID pParam);
 	int stream_component_open(VideoState *is, int stream_index);
 	inline int initDirectDraw(HWND hWnd, int nWidth, int nHight);

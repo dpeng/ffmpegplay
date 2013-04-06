@@ -187,6 +187,7 @@ bool FifoBuffer::write(AVFrameBuffer* vframe)
 	item->size		= vframe->size;
 	item->frameLen	= vframe->frameLen;
 	item->frameType	= vframe->frameType;
+	item->pts		= vframe->pts;
 	
 	if (m_chunksize > AUDIOBUFLEN)
 	{
@@ -215,14 +216,13 @@ bool FifoBuffer::read(AVFrameBuffer* vframe)
 		LeaveCriticalSection(&m_DataAccessLock) ;
 		return false ;
 	}
-	m_bReadNull = false;
-	vframe->width	= item->width ;
-	vframe->height	= item->height ;
-	vframe->size	= item->size;
-// 	vframe->context = item->context;
-
+	m_bReadNull       = false;
+	vframe->width	  = item->width ;
+	vframe->height	  = item->height ;
+	vframe->size	  = item->size;
 	vframe->frameLen  = item->frameLen;
 	vframe->frameType = item->frameType; 
+	vframe->pts		  = item->pts;
 
 	if (m_chunksize > AUDIOBUFLEN)
 	{
