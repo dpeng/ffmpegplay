@@ -21,7 +21,7 @@ typedef struct PacketQueue {
 	int nb_packets;
 	int size;
 	int abort_request;
-	CRITICAL_SECTION criticalSection;
+    CRITICAL_SECTION criticalSection;
 } PacketQueue;
 typedef struct VideoState {
 	AVStream *audio_st;
@@ -29,7 +29,7 @@ typedef struct VideoState {
 	AVFormatContext *ic;
 	int video_stream;
 	int audio_stream;
-	SwsContext *img_convert_ctx;
+    SwsContext *img_convert_ctx;
 	double video_current_pts;
 	double audio_clock;
 	PacketQueue videoq;
@@ -50,17 +50,16 @@ public:
 	void playOnlyAudio(BOOL isOnlyAudio);
 private:
 	AVPacket m_flushPkt;
-	HANDLE m_hreadProcess;
-	HANDLE m_videoDecHandler;
-	HANDLE m_audioDecHandler;
-	HANDLE m_ffmpegRenderHandler;
+    HANDLE m_hreadProcess;
+    HANDLE m_videoDecHandler;
+    HANDLE m_audioDecHandler;
+    HANDLE m_ffmpegRenderHandler;
 	VideoState m_currentStream;
 	AVFrameBuffer* m_videoItem ;
 	AVFrameBuffer* m_audioItem ;
 	FifoBuffer m_videoDataList;
 	FifoBuffer m_audioDataList;
-	HWND m_hWnd;
-	BOOL m_bDirectDrawInited;
+    HWND m_hWnd;
 	static DWORD WINAPI ffmpegReadPro(LPVOID pParam);
 	static DWORD WINAPI videoDecPro(LPVOID pParam);
 	static DWORD WINAPI audioDecPro(LPVOID pParam);
