@@ -60,6 +60,7 @@ private:
 	FifoBuffer m_videoDataList;
 	FifoBuffer m_audioDataList;
     HWND m_hWnd;
+	BOOL m_closeffPlay;
 	static DWORD WINAPI ffmpegReadPro(LPVOID pParam);
 	static DWORD WINAPI videoDecPro(LPVOID pParam);
 	static DWORD WINAPI audioDecPro(LPVOID pParam);

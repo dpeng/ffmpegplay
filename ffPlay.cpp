@@ -15,6 +15,7 @@ CffPlay::CffPlay(void)
 	m_audioItem = new AVFrameBuffer ;
 	memset(m_audioItem, 0, sizeof(AVFrameBuffer));
 	m_hWnd = NULL;
+	m_closeffPlay = FALSE;
 }
 
 CffPlay::~CffPlay(void)
@@ -30,6 +31,7 @@ CffPlay::~CffPlay(void)
 	delete m_audioItem;
 	m_audioItem = NULL;
 	m_hWnd = NULL;
+	m_closeffPlay = TRUE;
 }
 
 static AVPacket flush_pkt;
@@ -166,6 +168,10 @@ DWORD CffPlay::ffmpegRenderPro(LPVOID pParam)
 	double audioPts = 0.0;
 	while(1)
 	{
+		if (pThis->m_closeffPlay)
+		{
+			break;
+		}
 		if(videoPts < audioPts)
 		{
 			if (pThis->m_videoDataList.read(pThis->m_videoItem))
@@ -193,6 +199,7 @@ DWORD CffPlay::ffmpegRenderPro(LPVOID pParam)
 			}
 		}
 	}
+	return 0;
 }
 
 DWORD CffPlay::audioDecPro(LPVOID pParam)  
@@ -205,6 +212,10 @@ DWORD CffPlay::audioDecPro(LPVOID pParam)
 	unsigned char *buf = new unsigned char[AUDIOBUFLEN]; 
 	while(1)
 	{
+		if (pThis->m_closeffPlay)
+		{
+			break;
+		}
 		if (packet_queue_get(&is->audioq, pkt, 1) < 0)
 			continue;
 		avcodec_get_frame_defaults(frame);
@@ -232,6 +243,7 @@ DWORD CffPlay::audioDecPro(LPVOID pParam)
 	delete [] buf; 
 	av_free_packet(pkt);
 	avcodec_free_frame(&frame);
+	return 0;
 }
 
 DWORD CffPlay::videoDecPro(LPVOID pParam)  
@@ -246,7 +258,10 @@ DWORD CffPlay::videoDecPro(LPVOID pParam)
 	unsigned char *buf = new unsigned char[height*width*3/2]; 
 	while(1)
 	{
-		int eof = 0;
+		if (pThis->m_closeffPlay)
+		{
+			break;
+		}
 		(void)memset(pkt, 0, sizeof(pkt));
 		(void)memset(frame, 0, sizeof(frame));
 		if (packet_queue_get(&is->videoq, pkt, 1) < 0)
@@ -301,16 +316,19 @@ DWORD CffPlay::ffmpegReadPro(LPVOID pParam)
 	VideoState *is = &(pThis->m_currentStream);
 	while(1)
 	{
+		if (pThis->m_closeffPlay)
+		{
+			break;
+		}
 		if (is->videoq.nb_packets > 100 || is->audioq.nb_packets > 100)
 		{
 			continue;
 		}
-		int eof = 0;
 		(void)memset(pkt, 0, sizeof(pkt));
 		int ret = av_read_frame(is->ic, pkt);
 		if (ret == AVERROR_EOF)
 		{
-			eof = 1;
+			pThis->m_closeffPlay = TRUE;
 			break;
 		}
 		if (pkt->stream_index == is->video_stream)
@@ -358,6 +376,7 @@ void CffPlay::playMpegFile(char* fileName, HWND hWnd)
 	m_hWnd = hWnd;
 
 	initDirectDraw(hWnd, 0, 0);
+	m_closeffPlay = FALSE;
 	DWORD dw;
 	m_hreadProcess = CreateThread(NULL,0,CffPlay::ffmpegReadPro,this,0,&dw);
 	m_videoDecHandler = CreateThread(NULL,0,CffPlay::videoDecPro,this,0,&dw);
@@ -373,6 +392,8 @@ void CffPlay::playPause()
 
 void CffPlay::playClose()
 {
+	m_closeffPlay = TRUE;
+	Sleep(10);
 	CloseHandle(m_hreadProcess);
 	m_hreadProcess = NULL;
 	CloseHandle(m_videoDecHandler);
