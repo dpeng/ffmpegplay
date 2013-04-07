@@ -172,21 +172,21 @@ DWORD CffPlay::ffmpegRenderPro(LPVOID pParam)
 		{
 			if (pThis->m_videoDataList.read(pThis->m_videoItem))
 			{
-				videoPts = pThis->m_videoItem->pts;
 				int renderVideoRet = render_video(0, pThis->m_videoItem->context, 
 					pThis->m_videoItem->context + pThis->m_videoItem->width*pThis->m_videoItem->height, 
 					pThis->m_videoItem->context +pThis->m_videoItem->width*pThis->m_videoItem->height*5/4, 
 					pThis->m_videoItem->width, 
 					pThis->m_videoItem->height);
+				videoPts = pThis->m_videoItem->pts;
 			}
 		}
 		if (videoPts >= audioPts)
 		{
-			audioPts = pThis->m_audioItem->pts;
 			if (pThis->m_audioDataList.read(pThis->m_audioItem))
 			{
 				int renderAudioRet = render_audio(0, pThis->m_audioItem->context, pThis->m_audioItem->frameLen, 
 					is->audio_st->codec->sample_fmt*is->audio_st->codec->channels*8, pThis->m_audioItem->sampleRate);
+				audioPts = pThis->m_audioItem->pts;
 			}
 		}
 	}
