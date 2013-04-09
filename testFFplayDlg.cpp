@@ -10,7 +10,7 @@
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
-
+#define _CRTDBG_MAP_ALLOC 
 /////////////////////////////////////////////////////////////////////////////
 // CAboutDlg dialog used for App About
 
@@ -135,6 +135,7 @@ BOOL CTestFFplayDlg::OnInitDialog()
 	m_nPrePlayPosition = 0;
 	m_bOnlyPlayAudio = FALSE;
 	OnOpenfile();
+	_CrtDumpMemoryLeaks();
 	//OnBtnplay();
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }

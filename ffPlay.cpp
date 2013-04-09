@@ -237,6 +237,7 @@ DWORD CffPlay::audioDecPro(LPVOID pParam)
 		pThis->m_audioItem->pts = is->audio_clock;
 		while (pThis->m_audioDataList.write(pThis->m_audioItem) == false)
 		{
+			if (pThis->m_closeffPlay) break;
 			Sleep(10);
 		}
 	}
@@ -263,7 +264,6 @@ DWORD CffPlay::videoDecPro(LPVOID pParam)
 			break;
 		}
 		(void)memset(pkt, 0, sizeof(pkt));
-		(void)memset(frame, 0, sizeof(frame));
 		if (packet_queue_get(&is->videoq, pkt, 1) < 0)
 			continue;
 		avcodec_get_frame_defaults(frame);
@@ -299,6 +299,7 @@ DWORD CffPlay::videoDecPro(LPVOID pParam)
 		pThis->m_videoItem->pts = is->video_current_pts;
 		while (pThis->m_videoDataList.write(pThis->m_videoItem) == false)
 		{
+			if (pThis->m_closeffPlay) break;
 			Sleep(10);
 		}
 
@@ -401,6 +402,9 @@ void CffPlay::playClose()
 	CloseHandle(m_audioDecHandler);
 	m_audioDecHandler = NULL;
 	CloseHandle(m_ffmpegRenderHandler);
+	m_videoDataList.reset();
+	m_audioDataList.reset();
+	render_close(0);
 	packet_queue_destroy(&(m_currentStream.videoq));
 	packet_queue_destroy(&(m_currentStream.audioq));
 	m_ffmpegRenderHandler = NULL;
