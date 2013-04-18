@@ -59,8 +59,8 @@ private:
 	AVFrameBuffer* m_audioItem ;
 	FifoBuffer m_videoDataList;
 	FifoBuffer m_audioDataList;
-    HWND m_hWnd;
 	BOOL m_closeffPlay;
+	int m_streamIndex[AVMEDIA_TYPE_NB];
 	static DWORD WINAPI ffmpegReadPro(LPVOID pParam);
 	static DWORD WINAPI videoDecPro(LPVOID pParam);
 	static DWORD WINAPI audioDecPro(LPVOID pParam);

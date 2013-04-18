@@ -6,15 +6,12 @@ CffPlay::CffPlay(void)
 	m_videoDecHandler = NULL;
 	m_audioDecHandler = NULL;
 	m_ffmpegRenderHandler = NULL;
-	m_videoDataList.clear();
-	m_audioDataList.clear();
 	m_videoDataList.init(MAX_FRAME_BUFFER_SIZE, MAX_IMAGE_WIDTH*MAX_IMAGE_HEIGHT*3/2);
 	m_audioDataList.init(MAX_FRAME_BUFFER_SIZE, AUDIOBUFLEN);
 	m_videoItem = new AVFrameBuffer ;
 	memset(m_videoItem, 0, sizeof(AVFrameBuffer));
 	m_audioItem = new AVFrameBuffer ;
 	memset(m_audioItem, 0, sizeof(AVFrameBuffer));
-	m_hWnd = NULL;
 	m_closeffPlay = FALSE;
 }
 
@@ -30,7 +27,6 @@ CffPlay::~CffPlay(void)
 	m_videoItem = NULL;
 	delete m_audioItem;
 	m_audioItem = NULL;
-	m_hWnd = NULL;
 	m_closeffPlay = TRUE;
 }
 
@@ -89,7 +85,8 @@ static void packet_queue_flush(PacketQueue *q)
 	AVPacketList *pkt, *pkt1;
 
 	EnterCriticalSection(&(q->criticalSection));
-	for (pkt = q->first_pkt; pkt != NULL; pkt = pkt1) {
+	for (pkt = q->first_pkt; pkt != NULL; pkt = pkt1) 
+	{
 		pkt1 = pkt->next;
 		av_free_packet(&pkt->pkt);
 		av_freep(&pkt);
@@ -130,14 +127,17 @@ static int packet_queue_get(PacketQueue *q, AVPacket *pkt, int block)
 
 	EnterCriticalSection(&(q->criticalSection));
 
-	for (;;) {
-		if (q->abort_request) {
+	for (;;) 
+	{
+		if (q->abort_request) 
+		{
 			ret = -1;
 			break;
 		}
 
 		pkt1 = q->first_pkt;
-		if (pkt1) {
+		if (pkt1) 
+		{
 			q->first_pkt = pkt1->next;
 			if (!q->first_pkt)
 				q->last_pkt = NULL;
@@ -147,10 +147,14 @@ static int packet_queue_get(PacketQueue *q, AVPacket *pkt, int block)
 			av_free(pkt1);
 			ret = 1;
 			break;
-		} else if (!block) {
+		} 
+		else if (!block) 
+		{
 			ret = 0;
 			break;
-		} else {
+		} 
+		else 
+		{
 			Sleep(10);
 			ret = 0;
 			break;
@@ -199,6 +203,8 @@ DWORD CffPlay::ffmpegRenderPro(LPVOID pParam)
 			}
 		}
 	}
+	pThis->m_videoDataList.reset();
+	pThis->m_audioDataList.reset();
 	return 0;
 }
 
@@ -244,6 +250,7 @@ DWORD CffPlay::audioDecPro(LPVOID pParam)
 	delete [] buf; 
 	av_free_packet(pkt);
 	avcodec_free_frame(&frame);
+	pThis->m_audioDataList.reset();
 	return 0;
 }
 
@@ -307,6 +314,7 @@ DWORD CffPlay::videoDecPro(LPVOID pParam)
 	delete [] buf;  
 	av_free_packet(pkt);
 	avcodec_free_frame(&frame);
+	pThis->m_videoDataList.reset();
 	return 0;
 }
 
@@ -343,6 +351,8 @@ DWORD CffPlay::ffmpegReadPro(LPVOID pParam)
 
 	}
 	av_free_packet(pkt);
+	packet_queue_flush(&is->videoq);
+	packet_queue_flush(&is->audioq);
 	return 0;
 }
 /* Called from the main */
@@ -355,7 +365,6 @@ void CffPlay::playMpegFile(char* fileName, HWND hWnd)
 	av_init_packet(&m_flushPkt);
 
 	AVFormatContext *ic = NULL;
-	int st_index[AVMEDIA_TYPE_NB];
 	ic = avformat_alloc_context();
 	int err = avformat_open_input(&ic, fileName, NULL, NULL);
 	if (err < 0) 
@@ -367,15 +376,13 @@ void CffPlay::playMpegFile(char* fileName, HWND hWnd)
 	for (unsigned int i = 0; i < ic->nb_streams; i++)
 		ic->streams[i]->discard = AVDISCARD_ALL;
 	m_currentStream.ic = ic;
-	st_index[AVMEDIA_TYPE_VIDEO] = av_find_best_stream(ic, AVMEDIA_TYPE_VIDEO, -1, -1, NULL, 0);
-	st_index[AVMEDIA_TYPE_AUDIO] = av_find_best_stream(ic, AVMEDIA_TYPE_AUDIO, -1, st_index[AVMEDIA_TYPE_VIDEO], NULL, 0);
+	m_streamIndex[AVMEDIA_TYPE_VIDEO] = av_find_best_stream(ic, AVMEDIA_TYPE_VIDEO, -1, -1, NULL, 0);
+	m_streamIndex[AVMEDIA_TYPE_AUDIO] = av_find_best_stream(ic, AVMEDIA_TYPE_AUDIO, -1, m_streamIndex[AVMEDIA_TYPE_VIDEO], NULL, 0);
 	packet_queue_init(&(m_currentStream.videoq));
 	packet_queue_init(&(m_currentStream.audioq));
-	stream_component_open(&m_currentStream, st_index[AVMEDIA_TYPE_VIDEO]);
-	stream_component_open(&m_currentStream, st_index[AVMEDIA_TYPE_AUDIO]);
-
-	m_hWnd = hWnd;
-
+	stream_component_open(&m_currentStream, m_streamIndex[AVMEDIA_TYPE_VIDEO]);
+	stream_component_open(&m_currentStream, m_streamIndex[AVMEDIA_TYPE_AUDIO]);
+	
 	initDirectDraw(hWnd, 0, 0);
 	m_closeffPlay = FALSE;
 	DWORD dw;
@@ -393,8 +400,9 @@ void CffPlay::playPause()
 
 void CffPlay::playClose()
 {
+	avcodec_close(m_currentStream.ic->streams[m_streamIndex[AVMEDIA_TYPE_VIDEO]]->codec);
+	avcodec_close(m_currentStream.ic->streams[m_streamIndex[AVMEDIA_TYPE_AUDIO]]->codec);
 	m_closeffPlay = TRUE;
-	Sleep(10);
 	CloseHandle(m_hreadProcess);
 	m_hreadProcess = NULL;
 	CloseHandle(m_videoDecHandler);
@@ -408,7 +416,6 @@ void CffPlay::playClose()
 	packet_queue_destroy(&(m_currentStream.videoq));
 	packet_queue_destroy(&(m_currentStream.audioq));
 	m_ffmpegRenderHandler = NULL;
-	m_hWnd = NULL;
 }
 
 double CffPlay::playGetTotalTime()
@@ -500,7 +507,8 @@ int CffPlay::stream_component_open(VideoState *is, int stream_index)
 
 
     ic->streams[stream_index]->discard = AVDISCARD_DEFAULT;
-    switch (avctx->codec_type) {
+    switch (avctx->codec_type) 
+	{
     case AVMEDIA_TYPE_AUDIO:
         is->audio_st = ic->streams[stream_index];
 		is->audio_stream = stream_index;
