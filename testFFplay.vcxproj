@@ -22,7 +22,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <UseOfMfc>Dynamic</UseOfMfc>
+    <UseOfMfc>Static</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -118,10 +118,10 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>./SDL;./ffmpeg;./ffmpeg/libavutil;./ffmpeg/libavcodec;./ffmpeg/libavdevice;./ffmpeg/libavfilter;./ffmpeg/libavformat;./ffmpeg/libpostproc;./ffmpeg/libswscale;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./directShow;./ffmpeg;./ffmpeg/libavutil;./ffmpeg/libavcodec;./ffmpeg/libavdevice;./ffmpeg/libavfilter;./ffmpeg/libavformat;./ffmpeg/libpostproc;./ffmpeg/libswscale;./ffmpeg/libswresample;./ffmpeg/compat;./ffmpeg/libavresample;./fifoBuffer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>
       </PrecompiledHeader>
@@ -138,13 +138,15 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>SDL.lib;avcodec-52.lib;avformat-52.lib;avutil-50.lib;swscale-0.lib;avdevice-52.lib;postproc-51.lib;avfilter-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>nafxcwd.lib;render.lib;avcodec.lib;avformat.lib;avutil.lib;swscale.lib;avdevice.lib;avfilter.lib;swresample.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>.\Release/testFFplay.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>./SDL;./ffmpeg;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>./directShow;./ffmpeg;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>.\Release/testFFplay.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
