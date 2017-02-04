@@ -1,3 +1,14 @@
+Automatically exported from code.google.com/p/ffmpegplay
+
+
+
+
+
+
+
+
+
+
 ========================================================================
        MICROSOFT FOUNDATION CLASS LIBRARY : testFFplay
 ========================================================================
