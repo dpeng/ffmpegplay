@@ -2,3 +2,12 @@
 2. The mingw-w64-build-3.6 is running for ubuntu
 3. The mingw-w64-build-3.6 script will notice you when you lack of software
 4. For SDL configure I will update later
+
+
+
+
+
+
+==========================================================================================
+version 2
+1. using this project can build up in one command
