@@ -11,3 +11,21 @@
 ==========================================================================================
 version 2
 1. using this project can build up in one command
+
+add the disk useage of it:
+
+3.4G    ./sandbox/x86_64
+2.0G    ./sandbox/cross_compilers
+3.1G    ./sandbox/win32
+8.4G    ./sandbox
+20K     ./native_build/windows
+28K     ./native_build
+28K     ./.git/refs
+44K     ./.git/hooks
+8.0K    ./.git/info
+32K     ./.git/logs
+1.8M    ./.git/objects
+4.0K    ./.git/branches
+1.9M    ./.git
+1.2M    ./patches
+8.5G    .
